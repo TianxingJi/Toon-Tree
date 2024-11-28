@@ -1,0 +1,29 @@
+# ninja log v6
+1	56	1732758014854042682	StaticGLEW_autogen/timestamp	8fcb74e263429ec0
+1	56	1732758014854042682	StaticGLEW_autogen/mocs_compilation.cpp	8fcb74e263429ec0
+1	56	1732758014854042682	/Users/tevenji/Desktop/Brown CSCI 1230:2230/Toon-Tree/build/build-Toon-Tree-Qt_6_7_3_for_macOS-Debug/StaticGLEW_autogen/timestamp	8fcb74e263429ec0
+1	56	1732758014854042682	/Users/tevenji/Desktop/Brown CSCI 1230:2230/Toon-Tree/build/build-Toon-Tree-Qt_6_7_3_for_macOS-Debug/StaticGLEW_autogen/mocs_compilation.cpp	8fcb74e263429ec0
+58	80	1732758014863101073	CMakeFiles/StaticGLEW.dir/StaticGLEW_autogen/mocs_compilation.cpp.o	32f354d7261f8ea2
+58	476	1732758014863293282	CMakeFiles/StaticGLEW.dir/glew/src/glew.c.o	9a43bd8bae51bec0
+477	564	1732758015281948956	libStaticGLEW.a	f7a57836ab7e991
+564	1124	1732758015919256358	projects_realtime_autogen/timestamp	d6d6cfd0b603fa00
+564	1124	1732758015919256358	projects_realtime_autogen/mocs_compilation.cpp	d6d6cfd0b603fa00
+564	1124	1732758015919256358	/Users/tevenji/Desktop/Brown CSCI 1230:2230/Toon-Tree/build/build-Toon-Tree-Qt_6_7_3_for_macOS-Debug/projects_realtime_autogen/timestamp	d6d6cfd0b603fa00
+564	1124	1732758015919256358	/Users/tevenji/Desktop/Brown CSCI 1230:2230/Toon-Tree/build/build-Toon-Tree-Qt_6_7_3_for_macOS-Debug/projects_realtime_autogen/mocs_compilation.cpp	d6d6cfd0b603fa00
+1126	1143	1732758015947483122	.qt/rcc/qrc_Resources.cpp	74c069283c312af8
+1126	1143	1732758015947483122	/Users/tevenji/Desktop/Brown CSCI 1230:2230/Toon-Tree/build/build-Toon-Tree-Qt_6_7_3_for_macOS-Debug/.qt/rcc/qrc_Resources.cpp	74c069283c312af8
+1147	1196	1732758015951955734	CMakeFiles/projects_realtime.dir/build/build-Toon-Tree-Qt_6_7_3_for_macOS-Debug/.qt/rcc/qrc_Resources.cpp.o	d47b60f6b8e3cdd1
+1144	1606	1732758015949196091	CMakeFiles/projects_realtime.dir/src/settings.cpp.o	99acffeaabdce089
+1144	1702	1732758015949696470	CMakeFiles/projects_realtime.dir/src/camera/camera.cpp.o	886b28a194c6451c
+1145	1809	1732758015949870554	CMakeFiles/projects_realtime.dir/src/shapes/cube.cpp.o	c17b08ac690d6cd4
+1145	1831	1732758015950684642	CMakeFiles/projects_realtime.dir/src/shapes/sphere.cpp.o	314375a8227b7426
+1146	1850	1732758015951208646	CMakeFiles/projects_realtime.dir/src/shapes/cylinder.cpp.o	4f7c658bae075b44
+1146	1867	1732758015951660524	CMakeFiles/projects_realtime.dir/src/shapes/cone.cpp.o	22c1aecba484b352
+1145	1906	1732758015950090180	CMakeFiles/projects_realtime.dir/src/utils/sceneloader.cpp.o	a757fbff0123783e
+1143	2522	1732758015948752172	CMakeFiles/projects_realtime.dir/src/main.cpp.o	3e66a4e18295d1f7
+1143	2527	1732758015948523045	CMakeFiles/projects_realtime.dir/projects_realtime_autogen/mocs_compilation.cpp.o	fb3f2ec76ccc2c05
+1144	2632	1732758015949512552	CMakeFiles/projects_realtime.dir/src/utils/sceneparser.cpp.o	7e40435b95d917c2
+1144	2665	1732758015949034465	CMakeFiles/projects_realtime.dir/src/mainwindow.cpp.o	f00571cff2436ac7
+1144	2717	1732758015949363301	CMakeFiles/projects_realtime.dir/src/utils/scenefilereader.cpp.o	901637d4fda9eaf4
+1144	2767	1732758015948900631	CMakeFiles/projects_realtime.dir/src/realtime.cpp.o	c7e3e445ae5eac0a
+2767	2900	1732758017572597124	projects_realtime	68eefe4fd314c9d5

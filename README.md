@@ -1,2 +1,1 @@
-# Toon-Tree
-This is our final graphics project
+This is for Toon Tree!

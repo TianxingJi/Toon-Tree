@@ -316,7 +316,7 @@ void Realtime::LSystemShapeDataGeneration() {
     // Define the axiom and 3D branching rules
     std::string axiom = "X";
     std::unordered_map<char, std::string> rules = {
-        {'X', "F-[[X]+X]+F[&FX]/X^\\X"},  // 3D branching with all operators
+        {'X', "XXXF"},  // 3D branching with all operators
         {'F', "FF"}                       // Rule for elongation
     };
 

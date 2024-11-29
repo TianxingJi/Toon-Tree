@@ -34,14 +34,14 @@ glm::mat4 Realtime::customRotate(const glm::vec3& axis, float radians) {
 }
 
 void Realtime::initializeLights() {
-    // Clear existing lights
-    lights.clear();
+    // // Clear existing lights
+    // lights.clear();
 
     // Create a directional light
     CustomLightData directionalLight;
     directionalLight.type = 1; // 1 represents a directional light
-    directionalLight.color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f); // White light
-    directionalLight.direction = glm::vec4(-0.5f, -1.0f, -0.5f, 0.0f); // Light direction in world space
+    directionalLight.color = glm::vec4(1.f, 1.0f, 1.0f, 1.0f); // White light
+    directionalLight.direction = glm::vec4(-3.f, -2.0f, -1.f, 0.0f); // Light direction in world space
     directionalLight.function = glm::vec3(1.0f, 0.0f, 0.0f); // No attenuation (constant light intensity)
     directionalLight.position = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f); // Directional lights do not use position
 
@@ -54,7 +54,7 @@ void Realtime::interpretLSystem(const std::string& lSystemString, float angle, f
 
     // Initialize turtle state and stack
     std::stack<TurtleState> stateStack;
-    TurtleState turtle(glm::vec3(0.0f, -1.f, 0.0f)); // Start at origin with default directions
+    TurtleState turtle(glm::vec3(0.0f, -0.5f, 0.0f)); // Start at origin with default directions
 
     for (char c : lSystemString) {
         switch (c) {
@@ -64,15 +64,15 @@ void Realtime::interpretLSystem(const std::string& lSystemString, float angle, f
             std::vector<GLfloat> trunkVertices;
             generateShape(PrimitiveType::PRIMITIVE_CYLINDER, trunkVertices);
 
-            glm::mat4 modelMatrix = calculateModelMatrix(turtle.position, newPosition);
+            glm::mat4 modelMatrix = calculateModelMatrix(turtle.position, newPosition, 0.01f);
 
             createShapeData(
                 trunkVertices,
-                glm::vec4(0.4f, 0.2f, 0.1f, 1.0f), // Trunk ambient color
+                glm::vec4(0.4f, 1.f, 0.1f, 1.0f), // Trunk ambient color
                 glm::vec4(0.5f, 0.3f, 0.2f, 1.0f), // Trunk diffuse color
-                glm::vec4(0.6f, 0.4f, 0.3f, 1.0f), // Trunk specular color
-                32.0f,                              // Shininess
-                m_trunk_texture, // Texture
+                glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), // Trunk specular color
+                50.0f,                              // Shininess
+                0, // Texture
                 modelMatrix                     // Model matrix
                 );
 
@@ -85,15 +85,15 @@ void Realtime::interpretLSystem(const std::string& lSystemString, float angle, f
             std::vector<GLfloat> rootVertices;
             generateShape(PrimitiveType::PRIMITIVE_CYLINDER, rootVertices);
 
-            glm::mat4 modelMatrix = calculateModelMatrix(turtle.position, newPosition);
+            glm::mat4 modelMatrix = calculateModelMatrix(turtle.position, newPosition, 0.1f);
 
             createShapeData(
                 rootVertices,
                 glm::vec4(0.4f, 0.3f, 0.2f, 1.0f), // Root ambient color
                 glm::vec4(0.5f, 0.4f, 0.3f, 1.0f), // Root diffuse color
-                glm::vec4(0.7f, 0.5f, 0.4f, 1.0f), // Root specular color
-                16.0f,                              // Shininess
-                0,  // Texture
+                glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), // Root specular color
+                32.0f,                              // Shininess
+                m_trunk_texture,  // Texture
                 modelMatrix                      // Model matrix
                 );
 
@@ -162,32 +162,35 @@ void Realtime::generateShape(PrimitiveType type, std::vector<GLfloat> &vertices)
     generateVBOBasedOnType(phiTess, thetaTess, vertices, type);
 }
 
-glm::mat4 Realtime::calculateModelMatrix(const glm::vec3 &start, const glm::vec3 &end) {
+glm::mat4 Realtime::calculateModelMatrix(const glm::vec3 &start, const glm::vec3 &end, float thickness) {
     glm::vec3 direction = glm::normalize(end - start);
     glm::vec3 up(0.0f, 1.0f, 0.0f);
 
-    // 如果方向与 `up` 平行，使用备用向量
+    // If the direction is parallel to `up`, use an alternative vector
     if (glm::length(glm::cross(direction, up)) < 0.001f) {
         up = glm::vec3(1.0f, 0.0f, 0.0f);
     }
 
+    // Get the right direction (new z-axis)
     glm::vec3 right = glm::normalize(glm::cross(up, direction));
+
+    // Update the up vector (new x-axis)
     up = glm::normalize(glm::cross(direction, right));
 
-    // 生成旋转矩阵
+    // Generate rotation matrix
     glm::mat4 rotationMatrix(1.0f);
-    rotationMatrix[0] = glm::vec4(right, 0.0f);
-    rotationMatrix[1] = glm::vec4(direction, 0.0f);
-    rotationMatrix[2] = glm::vec4(up, 0.0f);
+    rotationMatrix[0] = glm::vec4(up, 0.0f);        // New x-axis
+    rotationMatrix[1] = glm::vec4(direction, 0.0f); // New y-axis
+    rotationMatrix[2] = glm::vec4(right, 0.0f);     // New z-axis
 
-    // 生成缩放矩阵：沿 `y` 方向按长度缩放
+    // Generate scaling matrix: scale along the y-axis based on length, and x/z based on thickness
     float scaleLength = glm::length(end - start);
-    glm::mat4 scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f, scaleLength, 0.1f)); // 横向粗细为0.1
+    glm::mat4 scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(thickness, scaleLength, thickness));
 
-    // 生成平移矩阵：将底部对齐到 `start` 点
+    // Generate translation matrix: align the base to the `start` point
     glm::mat4 translationMatrix = glm::translate(glm::mat4(1.0f), start + 0.5f * scaleLength * direction);
 
-    // 最终的 `modelMatrix`：先缩放，再旋转，最后平移
+    // Final `modelMatrix`: scale first, then rotate, and finally translate
     return translationMatrix * rotationMatrix * scalingMatrix;
 }
 
@@ -198,8 +201,11 @@ void Realtime::createShapeData(
     const glm::vec4& specularColor,
     float shininess,
     const GLuint& texture,
-    const glm::mat4& modelMatrix)
-{
+    const glm::mat4& modelMatrix,
+    float blend,
+    float repeatU,
+    float repeatV
+    ) {
     ShapeData shapeData;
 
     // Generate VAO and VBO
@@ -232,6 +238,9 @@ void Realtime::createShapeData(
     if (texture != 0) {
         shapeData.textureUsed = true;
         shapeData.diffuseTexture = texture;
+        shapeData.blend = blend;
+        shapeData.repeatU = repeatU;
+        shapeData.repeatV = repeatV;
     } else {
         shapeData.textureUsed = false;
     }
@@ -295,6 +304,11 @@ void Realtime::paintLSystem() {
 
         // Set model matrix
         glUniformMatrix4fv(glGetUniformLocation(m_shader, "modelMatrix"), 1, GL_FALSE, &shape.modelMatrix[0][0]);
+
+        // Set normal matrix
+        glm::mat3 normalMatrix = glm::inverse(glm::transpose(glm::mat3(shape.modelMatrix)));
+        GLint normalMatrixLocation = glGetUniformLocation(m_shader, "normalMatrix");
+        glUniformMatrix3fv(normalMatrixLocation, 1, GL_FALSE, &normalMatrix[0][0]);
 
         if (shape.textureUsed) {
             // Pass the textureUsed uniform

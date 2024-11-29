@@ -70,7 +70,7 @@ public:
     void lSystemGeneration();
     void interpretLSystem(const std::string& lSystemString, float angle, float length);
     void generateShape(PrimitiveType type, std::vector<GLfloat> &vertices);
-    glm::mat4 calculateModelMatrix(const glm::vec3 &start, const glm::vec3 &end);
+    glm::mat4 calculateModelMatrix(const glm::vec3 &start, const glm::vec3 &end, float thickness);
     void createShapeData(
         const std::vector<GLfloat>& vertices,
         const glm::vec4& ambientColor,
@@ -78,8 +78,11 @@ public:
         const glm::vec4& specularColor,
         float shininess,
         const GLuint& texture,
-        const glm::mat4& modelMatrix);
-
+        const glm::mat4& modelMatrix,
+        float blend = 1.0f,  // Default blend factor
+        float repeatU = 1.0f, // Default U texture repeat
+        float repeatV = 1.0f  // Default V texture repeat
+        );
     void settingsChanged();
     void saveViewportImage(std::string filePath);
 

@@ -81,12 +81,12 @@ void MainWindow::initialize() {
     p1Slider = new QSlider(Qt::Orientation::Horizontal); // Parameter 1 slider
     p1Slider->setTickInterval(1);
     p1Slider->setMinimum(1);
-    p1Slider->setMaximum(10);
+    p1Slider->setMaximum(5);
     p1Slider->setValue(1);
 
     p1Box = new QSpinBox();
     p1Box->setMinimum(1);
-    p1Box->setMaximum(10);
+    p1Box->setMaximum(5);
     p1Box->setSingleStep(1);
     p1Box->setValue(1);
 
@@ -218,7 +218,7 @@ void MainWindow::initialize() {
 
     // Set default values for near and far planes
     onValChangeNearBox(0.1f);
-    onValChangeFarBox(10.f);
+    onValChangeFarBox(100.f);
 }
 
 void MainWindow::finish() {

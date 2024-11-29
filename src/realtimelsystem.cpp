@@ -33,57 +33,96 @@ glm::mat4 Realtime::customRotate(const glm::vec3& axis, float radians) {
 }
 
 void Realtime::initializeLights() {
+    // Clear existing lights
     lights.clear();
-    // Example point light
-    CustomLightData pointLight;
-    pointLight.type = 0; // Point light
-    pointLight.color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f); // White light
-    pointLight.function = glm::vec3(1.0f, 0.1f, 0.01f); // Attenuation
-    pointLight.position = glm::vec4(2.0f, 2.0f, 2.0f, 1.0f); // Position in world space
-    lights.push_back(pointLight);
 
-    // Example directional light
+    // Create a directional light
     CustomLightData directionalLight;
-    directionalLight.type = 1; // Directional light
+    directionalLight.type = 1; // 1 represents a directional light
     directionalLight.color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f); // White light
-    directionalLight.direction = glm::vec4(-1.0f, -1.0f, -1.0f, 0.0f); // Direction in world space
+    directionalLight.direction = glm::vec4(-0.5f, -1.0f, -0.5f, 0.0f); // Light direction in world space
+    directionalLight.function = glm::vec3(1.0f, 0.0f, 0.0f); // No attenuation (constant light intensity)
+    directionalLight.position = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f); // Directional lights do not use position
+
+    // Add the light to the lights vector
     lights.push_back(directionalLight);
 }
 
 void Realtime::interpretLSystem(const std::string& lSystemString, float angle, float length) {
-    std::vector<GLfloat> vertices; // To store all line segment vertices
+    m_shapeData.clear();
+    std::vector<GLfloat> vertices; // Store vertices for lines
 
-    std::stack<std::pair<glm::vec3, glm::vec3>> stateStack;
-
-    glm::vec3 position(0.0f, 0.0f, 0.0f);    // Starting position
-    glm::vec3 direction(0.0f, 1.0f, 0.0f);   // Starting direction (Y-axis)
-
-    glm::vec3 up(0.0f, 0.0f, 1.0f);          // Default "up" vector (Z-axis)
+    // Initialize turtle state and stack
+    std::stack<TurtleState> stateStack;
+    TurtleState turtle(glm::vec3(0.0f, -1.f, 0.0f)); // Start at origin with default directions
 
     for (char c : lSystemString) {
-        if (c == 'F') {
-            glm::vec3 newPosition = position + direction * length;
-            drawLine(position, newPosition, vertices); // Add line vertices
-            position = newPosition;
-        } else if (c == '+') {
-            glm::mat4 rotationMatrix = customRotate(up, glm::radians(-angle));
-            direction = glm::vec3(rotationMatrix * glm::vec4(direction, 0.0f));
-        } else if (c == '-') {
-            glm::mat4 rotationMatrix = customRotate(up, glm::radians(angle));
-            direction = glm::vec3(rotationMatrix * glm::vec4(direction, 0.0f));
-        } else if (c == '[') {
-            stateStack.push({position, direction});
-        } else if (c == ']') {
+        switch (c) {
+        case 'F': { // Move forward in the grow direction
+            glm::vec3 newPosition = turtle.position + turtle.growDirection * length;
+            drawLine(turtle.position, newPosition, vertices);
+            turtle.position = newPosition;
+            break;
+        }
+        case 'X': { // Draw the root
+            glm::vec3 newPosition = turtle.position + turtle.growDirection * (length * 0.5f);
+            drawLine(turtle.position, newPosition, vertices);
+            turtle.position = newPosition;
+            break;
+        }
+        case '+': { // Rotate GrowDirection left/right (Yaw)
+            glm::mat4 rotationMatrix = customRotate(turtle.forwardDirection, glm::radians(angle));
+            turtle.growDirection = glm::normalize(glm::vec3(rotationMatrix * glm::vec4(turtle.growDirection, 0.0f)));
+            turtle.rightDirection = glm::normalize(glm::cross(turtle.growDirection, turtle.forwardDirection));
+            break;
+        }
+        case '-': { // Rotate GrowDirection right/left (Yaw, opposite)
+            glm::mat4 rotationMatrix = customRotate(turtle.forwardDirection, glm::radians(-angle));
+            turtle.growDirection = glm::normalize(glm::vec3(rotationMatrix * glm::vec4(turtle.growDirection, 0.0f)));
+            turtle.rightDirection = glm::normalize(glm::cross(turtle.growDirection, turtle.forwardDirection));
+            break;
+        }
+        case '&': { // Rotate GrowDirection forward/backward (Pitch)
+            glm::mat4 rotationMatrix = customRotate(turtle.rightDirection, glm::radians(-angle));
+            turtle.growDirection = glm::normalize(glm::vec3(rotationMatrix * glm::vec4(turtle.growDirection, 0.0f)));
+            turtle.forwardDirection = glm::normalize(glm::cross(turtle.rightDirection, turtle.growDirection));
+            break;
+        }
+        case '^': { // Rotate GrowDirection backward/forward (Pitch, opposite)
+            glm::mat4 rotationMatrix = customRotate(turtle.rightDirection, glm::radians(angle));
+            turtle.growDirection = glm::normalize(glm::vec3(rotationMatrix * glm::vec4(turtle.growDirection, 0.0f)));
+            turtle.forwardDirection = glm::normalize(glm::cross(turtle.rightDirection, turtle.growDirection));
+            break;
+        }
+        case '/': { // Roll GrowDirection clockwise (Roll)
+            glm::mat4 rotationMatrix = customRotate(turtle.growDirection, glm::radians(-angle));
+            turtle.forwardDirection = glm::normalize(glm::vec3(rotationMatrix * glm::vec4(turtle.forwardDirection, 0.0f)));
+            turtle.rightDirection = glm::normalize(glm::cross(turtle.growDirection, turtle.forwardDirection));
+            break;
+        }
+        case '\\': { // Roll GrowDirection counter-clockwise (Roll, opposite)
+            glm::mat4 rotationMatrix = customRotate(turtle.growDirection, glm::radians(angle));
+            turtle.forwardDirection = glm::normalize(glm::vec3(rotationMatrix * glm::vec4(turtle.forwardDirection, 0.0f)));
+            turtle.rightDirection = glm::normalize(glm::cross(turtle.growDirection, turtle.forwardDirection));
+            break;
+        }
+        case '[': { // Save current state
+            stateStack.push(turtle);
+            break;
+        }
+        case ']': { // Restore saved state
             if (!stateStack.empty()) {
-                auto state = stateStack.top();
+                turtle = stateStack.top();
                 stateStack.pop();
-                position = state.first;
-                direction = state.second;
             }
+            break;
+        }
+        default:
+            break;
         }
     }
 
-    // Create VBO and VAO for the entire line data
+    // Generate VAO/VBO for the collected vertices
     ShapeData lineShape;
     glGenVertexArrays(1, &lineShape.vao);
     glGenBuffers(1, &lineShape.vbo);
@@ -100,14 +139,13 @@ void Realtime::interpretLSystem(const std::string& lSystemString, float angle, f
 
     lineShape.vertexCount = vertices.size() / 6;
 
-    // Initialize material properties
-    lineShape.ambient = glm::vec4(1.f, 0.f, 0.f, 1.0f); // Example ambient color
-    lineShape.diffuse = glm::vec4(0.6f, 0.6f, 0.6f, 1.0f); // Example diffuse color
-    lineShape.specular = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f); // Example specular color
-    lineShape.shininess = 32.0f; // Example shininess coefficient
+    // Set material properties
+    lineShape.ambient = glm::vec4(1.f, 0.f, 0.f, 1.0f); // Example color
+    lineShape.diffuse = glm::vec4(0.6f, 0.6f, 0.6f, 1.0f);
+    lineShape.specular = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+    lineShape.shininess = 32.0f;
 
     lineShape.modelMatrix = glm::mat4(1.0f); // Identity matrix for now
-
     m_shapeData.push_back(lineShape);
 
     // Cleanup
@@ -140,17 +178,9 @@ void Realtime::paintLSystem() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glUseProgram(m_shader);
 
-    // Define view and projection matrices
-    glm::vec3 eye(-3.0f, -3.0f, -3.0f); // Camera position
-    glm::vec3 center(0.0f, 0.0f, 0.0f); // Look-at target
-    glm::vec3 up(0.0f, 1.0f, 0.0f);     // Up direction
-
-    glm::mat4 viewMatrix = glm::lookAt(eye, center, up);
-    glm::mat4 projMatrix = glm::perspective(glm::radians(30.0f), static_cast<float>(m_width) / m_height, 0.1f, 100.0f);
-
     // Pass view and projection matrices
-    glUniformMatrix4fv(glGetUniformLocation(m_shader, "viewMatrix"), 1, GL_FALSE, &viewMatrix[0][0]);
-    glUniformMatrix4fv(glGetUniformLocation(m_shader, "projMatrix"), 1, GL_FALSE, &projMatrix[0][0]);
+    glUniformMatrix4fv(glGetUniformLocation(m_shader, "viewMatrix"), 1, GL_FALSE, &m_view[0][0]);
+    glUniformMatrix4fv(glGetUniformLocation(m_shader, "projMatrix"), 1, GL_FALSE, &m_proj[0][0]);
 
     // Pass camera position
     glUniform4fv(glGetUniformLocation(m_shader, "cameraPosition"), 1, &glm::vec4(eye, 1.0f)[0]);

@@ -4,6 +4,8 @@
 #include <QMouseEvent>
 #include <QKeyEvent>
 #include <iostream>
+#include "glm/ext/matrix_clip_space.hpp"
+#include "glm/ext/matrix_transform.hpp"
 #include "lsystem/lsystem.h"
 #include "settings.h"
 #include "utils/shaderloader.h"
@@ -99,6 +101,7 @@ void Realtime::initializeGL() { // TODO: m_Data should be finished
 
     glUseProgram(0);
 
+
     std::vector<GLfloat> fullscreen_quad_data =
         { // POSITIONS       // UV COORDINATES
             -1.0f,  1.0f, 0.0f,   0.0f, 1.0f,  // Upper Left
@@ -128,6 +131,10 @@ void Realtime::initializeGL() { // TODO: m_Data should be finished
     glBindVertexArray(0);
 
     makeFBO();
+
+    // L System Logic Below
+    m_view = glm::lookAt(eye, center, up);
+    m_proj = glm::perspective(glm::radians(30.0f), static_cast<float>(m_width) / m_height, settings.nearPlane, settings.farPlane);
 }
 
 void Realtime::makeFBO(){
@@ -230,7 +237,7 @@ void Realtime::resizeGL(int w, int h) {
 
     // Students: anything requiring OpenGL calls when the program starts should be done here
     // new perspective should be calculated here
-    sceneLoader.updateProjMatrixResize(w, h);
+    m_proj = glm::perspective(glm::radians(30.0f), static_cast<float>(m_width) / m_height, settings.nearPlane, settings.farPlane);
 
     update();
 }
@@ -270,21 +277,29 @@ void Realtime::sceneChanged() {
 void Realtime::LSystemShapeDataGeneration() {
     clearShapeData(m_shapeData);
 
-    // Step 1: Define the L-System axiom and rules
-    std::string axiom = "F";
+    // Define the axiom and 3D branching rules
+    std::string axiom = "X";
     std::unordered_map<char, std::string> rules = {
-        {'F', "F[+F]F[-F]F"}
+        {'X', "F-[[X]+X]+F[&FX]/X^\\X"},  // 3D branching with all operators
+        {'F', "FF"}                       // Rule for elongation
     };
 
-    // 使用 settings.shapeParameter1 来设置迭代次数
+    // Set the number of iterations
     int iterations = settings.shapeParameter1;
 
-    // Step 2: Generate L-System string
+    // Generate the L-System string
     LSystem lSystem(axiom, rules, iterations);
     std::string lSystemString = lSystem.generate();
 
-    // Step 3: Interpret L-System string and generate geometry
-    interpretLSystem(lSystemString, 5.0f * settings.shapeParameter3, 0.02f * settings.shapeParameter2);
+    // Set angle and length based on user parameters
+    float angle = 25.0f * settings.shapeParameter3;    // Base angle
+    float length = settings.shapeParameter2 * 0.1f;   // Segment length
+
+    // Debug: Print the L-System string
+    std::cout << "Generated L-System String: " << lSystemString.substr(0, 500) << "...\n";
+
+    // Interpret the generated L-System string to create geometry
+    interpretLSystem(lSystemString, angle, length);
 }
 
 void Realtime::lSystemGeneration() {
@@ -293,22 +308,21 @@ void Realtime::lSystemGeneration() {
 }
 
 void Realtime::settingsChanged() {
-    this->makeCurrent();
-
     // Static variables to track previous settings
     static Settings previousSettings = settings;
 
-    // // Check if nearPlane or farPlane has changed
-    // if (settings.nearPlane != previousSettings.nearPlane ||
-    //     settings.farPlane != previousSettings.farPlane) {
-    //     sceneLoader.updateProjMatrixParam();
-    // }
+    // Check if nearPlane or farPlane has changed
+    if (settings.nearPlane != previousSettings.nearPlane ||
+        settings.farPlane != previousSettings.farPlane) {
+        // TODO::only update proj matrix here
+        m_proj = glm::perspective(glm::radians(30.0f), static_cast<float>(m_width) / m_height, settings.nearPlane, settings.farPlane);
+    }
 
     // Check if shapeParameter1 or shapeParameter2 has changed
     if (settings.shapeParameter1 != previousSettings.shapeParameter1 ||
         settings.shapeParameter2 != previousSettings.shapeParameter2 ||
         settings.shapeParameter3 != previousSettings.shapeParameter3) {
-        clearShapeData(m_shapeData);
+        LSystemShapeDataGeneration();
     }
 
     // Update the stored previous settings
@@ -343,91 +357,106 @@ void Realtime::mouseReleaseEvent(QMouseEvent *event) {
 
 void Realtime::mouseMoveEvent(QMouseEvent *event) {
     if (m_mouseDown) {
-        int posX = event->position().x();
-        int posY = event->position().y();
-        int deltaX = posX - m_prev_mouse_pos.x;
-        int deltaY = posY - m_prev_mouse_pos.y;
+        // Get the current mouse position
+        float posX = event->position().x();
+        float posY = event->position().y();
+
+        // Calculate the mouse movement offset
+        float deltaX = posX - m_prev_mouse_pos.x;
+        float deltaY = posY - m_prev_mouse_pos.y;
+
+        // Update the previous mouse position
         m_prev_mouse_pos = glm::vec2(posX, posY);
 
-        // Use deltaX and deltaY here to rotate
+        // Set mouse sensitivity for rotation
         float sensitivity = 0.005f;
 
-        // Variables to store the updated look and up vectors
-        glm::vec4 newLook = sceneLoader.getCamera().look;
-        glm::vec4 newUp = sceneLoader.getCamera().up;
-
-        // Horizontal rotation (rotate around the world Y-axis)
+        // Horizontal rotation (rotate around the world's Y-axis)
         if (deltaX != 0) {
-            float angle = deltaX * sensitivity;  // Calculate the rotation angle
-            glm::vec3 worldUp(0.0f, 1.0f, 0.0f); // World space Y-axis as the rotation axis
+            float angle = -deltaX * sensitivity; // Reverse the sign for intuitive left/right rotation
+            glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0.0f, 1.0f, 0.0f)); // Rotate around Y-axis
 
-            // Compute the rotation matrix using the customRotate function
-            glm::mat4 rotationMatrix = customRotate(worldUp, angle);
-
-            // Update the look and up vectors using the rotation matrix
-            newLook = rotationMatrix * newLook;
-            newUp = rotationMatrix * newUp;
+            // Update the look direction (center - eye)
+            glm::vec3 lookDir = glm::normalize(center - eye);
+            lookDir = glm::mat3(rotationMatrix) * lookDir; // Apply rotation to the look direction
+            center = eye + lookDir; // Update the target point
         }
 
-        // Vertical rotation (rotate around the camera's right vector)
-        if (deltaY != 0) {
-            float angle = deltaY * sensitivity;  // Calculate the rotation angle
+        // // Vertical rotation (rotate around the camera's right vector)
+        // if (deltaY != 0) {
+        //     float angle = -deltaY * sensitivity; // Reverse the sign for intuitive up/down rotation
+        //     glm::vec3 right = glm::normalize(glm::cross(center - eye, up)); // Calculate the right vector of the camera
 
-            // Compute the rotation matrix using the side vector as the axis
-            glm::mat4 rotationMatrix = customRotate(sceneLoader.getCamera().side, angle);
+        //     // Create a rotation matrix around the right vector and apply it
+        //     glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), angle, right);
+        //     glm::vec3 lookDir = glm::normalize(center - eye); // Current look direction
+        //     glm::vec3 newLookDir = glm::mat3(rotationMatrix) * lookDir; // New look direction
 
-            // Update the look and up vectors using the rotation matrix
-            newLook = rotationMatrix * newLook;
-            newUp = rotationMatrix * newUp;
-        }
+        //     // Prevent flipping by clamping the vertical rotation
+        //     if (glm::dot(newLookDir, up) > 0.99f || glm::dot(newLookDir, up) < -0.99f) {
+        //         // Ignore rotation to prevent flipping if the look direction gets too vertical
+        //     } else {
+        //         center = eye + newLookDir; // Update the target point
+        //         up = glm::normalize(glm::cross(right, newLookDir)); // Update the up vector
+        //     }
+        // }
 
-        // Update the camera's view matrix with the new look and up vectors
-        sceneLoader.updateViewMatrixRotation(newLook, newUp);
+        // Update the view matrix using the new eye, center, and up vectors
+        m_view = glm::lookAt(eye, center, up);
 
-        // Request a redraw of the scene with the updated camera orientation
-        update(); // Triggers a PaintGL() call
+        // Request a redraw to reflect the updated camera orientation
+        update();
     }
 }
 
 void Realtime::timerEvent(QTimerEvent *event) {
-    int elapsedms   = m_elapsedTimer.elapsed();
-    float deltaTime = elapsedms * 0.001f;
+    // Calculate delta time
+    int elapsedms = m_elapsedTimer.elapsed();
+    float deltaTime = elapsedms * 0.001f; // Convert to seconds
     m_elapsedTimer.restart();
 
-    // Use deltaTime and m_keyMap here to move around
-    float moveSpeed = 5.0f;
+    // Movement speed
+    float moveSpeed = 2.0f; // Adjust as needed for speed
 
-    glm::vec3 look = sceneLoader.getCamera().look;
-    glm::vec3 up = sceneLoader.getCamera().up;
-    glm::vec3 side = sceneLoader.getCamera().side;
+    // Compute the camera directions
+    glm::vec3 look = glm::normalize(center - eye); // Forward direction
+    glm::vec3 right = glm::normalize(glm::cross(look, up)); // Right direction
 
+    // Initialize movement direction
     glm::vec3 moveDirection(0.0f);
 
+    // Handle movement keys
     if (m_keyMap[Qt::Key_W]) {
-        moveDirection += look; // Forward
+        moveDirection += look; // Move forward
     }
     if (m_keyMap[Qt::Key_S]) {
-        moveDirection -= look; // Backward
+        moveDirection -= look; // Move backward
     }
     if (m_keyMap[Qt::Key_A]) {
-        moveDirection -= side; // Left
+        moveDirection -= right; // Move left
     }
     if (m_keyMap[Qt::Key_D]) {
-        moveDirection += side; // Right
+        moveDirection += right; // Move right
     }
     if (m_keyMap[Qt::Key_Space]) {
-        moveDirection += up;   // Up
+        moveDirection += up;   // Move up
     }
     if (m_keyMap[Qt::Key_Control]) {
-        moveDirection -= up;   // Down
+        moveDirection -= up;   // Move down
     }
 
+    // Normalize and scale movement
     if (glm::length(moveDirection) > 0.0f) {
         moveDirection = glm::normalize(moveDirection) * moveSpeed * deltaTime;
-        sceneLoader.updateViewMatrix(moveDirection);
+        eye += moveDirection;  // Update camera position
+        center += moveDirection; // Keep the target moving with the camera
     }
 
-    update(); // asks for a PaintGL() call to occur
+    // Update the view matrix
+    m_view = glm::lookAt(eye, center, up);
+
+    // Trigger a redraw
+    update(); // Ask for a PaintGL() call
 }
 
 // DO NOT EDIT

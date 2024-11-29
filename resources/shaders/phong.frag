@@ -41,87 +41,85 @@ uniform Light lights[8];   // Array of lights, up to eight lights
 uniform int numLights;     // Actual number of active lights
 
 void main() {
-    // // Ambient color
-    // vec4 ambientColor = ka * material.ambient;
-    // fragColor = ambientColor;
+    // Ambient color
+    vec4 ambientColor = ka * material.ambient;
+    fragColor = ambientColor;
 
-    // // Normalize world-space normal
-    // vec3 normal = normalize(worldSpaceNormal);
+    // Normalize world-space normal
+    vec3 normal = normalize(worldSpaceNormal);
 
-    // // Compute the view direction (from fragment to camera)
-    // vec3 viewDir = normalize(vec3(cameraPosition) - worldSpacePosition);
+    // Compute the view direction (from fragment to camera)
+    vec3 viewDir = normalize(vec3(cameraPosition) - worldSpacePosition);
 
-    // // Loop through each light
-    // for (int i = 0; i < numLights; i++) {
-    //      Light lightData = lights[i];
-    //      vec3 lightDir; // Direction to the light
-    //      float attenuationFactor = 1.0;
+    // Loop through each light
+    for (int i = 0; i < numLights; i++) {
+         Light lightData = lights[i];
+         vec3 lightDir; // Direction to the light
+         float attenuationFactor = 1.0;
 
-    //      if (lightData.type == 0) { // Point Light
+         if (lightData.type == 0) { // Point Light
 
-    //          vec3 lightPos = vec3(lightData.position);
-    //          lightDir = normalize(lightPos - worldSpacePosition);
+             vec3 lightPos = vec3(lightData.position);
+             lightDir = normalize(lightPos - worldSpacePosition);
 
-    //          // Compute attenuation
-    //          float distance = length(lightPos - worldSpacePosition);
-    //          attenuationFactor = 1.0 / (lightData.function.x +
-    //                                     lightData.function.y * distance +
-    //                                     lightData.function.z * distance * distance);
+             // Compute attenuation
+             float distance = length(lightPos - worldSpacePosition);
+             attenuationFactor = 1.0 / (lightData.function.x +
+                                        lightData.function.y * distance +
+                                        lightData.function.z * distance * distance);
 
-    //      } else if (lightData.type == 1) { // Directional Light
-    //          lightDir = normalize(vec3(-lightData.direction)); // Inverse of light direction
+         } else if (lightData.type == 1) { // Directional Light
+             lightDir = normalize(vec3(-lightData.direction)); // Inverse of light direction
 
-    //      } else if (lightData.type == 2) { // Spot Light
-    //          vec3 lightPos = vec3(lightData.position);
-    //          lightDir = normalize(lightPos - worldSpacePosition);
+         } else if (lightData.type == 2) { // Spot Light
+             vec3 lightPos = vec3(lightData.position);
+             lightDir = normalize(lightPos - worldSpacePosition);
 
-    //          // Compute attenuation
-    //          float distance = length(lightPos - worldSpacePosition);
-    //          attenuationFactor = 1.0 / (lightData.function.x +
-    //                                     lightData.function.y * distance +
-    //                                     lightData.function.z * distance * distance);
+             // Compute attenuation
+             float distance = length(lightPos - worldSpacePosition);
+             attenuationFactor = 1.0 / (lightData.function.x +
+                                        lightData.function.y * distance +
+                                        lightData.function.z * distance * distance);
 
-    //          // Check spotlight cone
-    //          float angleCosine = dot(normalize(-lightDir), normalize(vec3(lightData.direction)));
-    //          angleCosine = clamp(angleCosine, -1.0, 1.0);
+             // Check spotlight cone
+             float angleCosine = dot(normalize(-lightDir), normalize(vec3(lightData.direction)));
+             angleCosine = clamp(angleCosine, -1.0, 1.0);
 
-    //          float currentAngle = acos(angleCosine);
-    //          float thetaInner = lightData.angle - lightData.penumbra;
-    //          float thetaOuter = lightData.angle;
+             float currentAngle = acos(angleCosine);
+             float thetaInner = lightData.angle - lightData.penumbra;
+             float thetaOuter = lightData.angle;
 
-    //          if (currentAngle > thetaOuter) {
-    //          continue; // Outside the spotlight cone
-    //          }
+             if (currentAngle > thetaOuter) {
+             continue; // Outside the spotlight cone
+             }
 
-    //          if (currentAngle > thetaInner) {
-    //          // Compute smooth falloff
-    //          float t = (currentAngle - thetaInner) / (thetaOuter - thetaInner);
-    //          attenuationFactor *= (1.0 - (3.0 * t * t - 2.0 * t * t * t)); // Smoothstep
-    //          }
+             if (currentAngle > thetaInner) {
+             // Compute smooth falloff
+             float t = (currentAngle - thetaInner) / (thetaOuter - thetaInner);
+             attenuationFactor *= (1.0 - (3.0 * t * t - 2.0 * t * t * t)); // Smoothstep
+             }
 
-    //      }
+         }
 
-    //      // Diffuse lighting
-    //      float diffuseFactor = max(dot(normal, lightDir), 0.0);
-    //      vec4 blendedDiffuse =  kd * material.diffuse; // Set up for Texture Mapping
+         // Diffuse lighting
+         float diffuseFactor = max(dot(normal, lightDir), 0.0);
+         vec4 blendedDiffuse =  kd * material.diffuse; // Set up for Texture Mapping
 
-    //      vec4 diffuseColor = blendedDiffuse * diffuseFactor;
-    //      fragColor += attenuationFactor * lightData.color * diffuseColor;
+         vec4 diffuseColor = blendedDiffuse * diffuseFactor;
+         fragColor += attenuationFactor * lightData.color * diffuseColor;
 
-    //      // Specular lighting
-    //      vec3 reflectedDir = reflect(-lightDir, normal);
-    //      float specularFactor = max(dot(normalize(reflectedDir), viewDir), 0.0);
+         // Specular lighting
+         vec3 reflectedDir = reflect(-lightDir, normal);
+         float specularFactor = max(dot(normalize(reflectedDir), viewDir), 0.0);
 
-    //      if (material.shininess > 0.0) {
-    //          specularFactor = pow(specularFactor, material.shininess);
-    //      } else {
-    //          specularFactor = 1.0; // Handle shininess = 0 case
-    //      }
-    //      vec4 specularColor = ks * material.specular * specularFactor;
+         if (material.shininess > 0.0) {
+             specularFactor = pow(specularFactor, material.shininess);
+         } else {
+             specularFactor = 1.0; // Handle shininess = 0 case
+         }
+         vec4 specularColor = ks * material.specular * specularFactor;
 
-    //      fragColor += attenuationFactor * lightData.color * specularColor;
-    // }
-
-    fragColor = vec4(1.f, 0.f, 0.f, 1.f);
+         fragColor += attenuationFactor * lightData.color * specularColor;
+    }
 
 }

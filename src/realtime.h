@@ -41,6 +41,22 @@ struct CustomLightData {
     float angle;       // Outer cone angle for spotlights
 };
 
+struct TurtleState {
+    glm::vec3 position;         // Current position of the turtle
+    glm::vec3 growDirection;    // Y-axis equivalent: direction in which the turtle "grows"
+    glm::vec3 forwardDirection; // Z-axis equivalent: direction the turtle is "facing"
+    glm::vec3 rightDirection;   // X-axis equivalent: right-hand direction
+
+    TurtleState(const glm::vec3& pos,
+                const glm::vec3& growDir = glm::vec3(0.0f, 1.0f, 0.0f),
+                const glm::vec3& forwardDir = glm::vec3(0.0f, 0.0f, -1.0f),
+                const glm::vec3& rightDir = glm::vec3(1.0f, 0.0f, 0.0f))
+        : position(pos),
+        growDirection(glm::normalize(growDir)),
+        forwardDirection(glm::normalize(forwardDir)),
+        rightDirection(glm::normalize(rightDir)) {}
+};
+
 class Realtime : public QOpenGLWidget
 {
 public:
@@ -92,6 +108,16 @@ private:
 
     // For original Gemoetry painting
     void paintGeometry();
+
+    // For L System
+    glm::mat4 m_model = glm::mat4(1);
+    glm::mat4 m_view  = glm::mat4(1);
+    glm::mat4 m_proj  = glm::mat4(1);
+
+    // Camera parameters
+    glm::vec3 eye = glm::vec3(0.0f, 0.0f, 3.0f);  // Default camera position
+    glm::vec3 center = glm::vec3(0.0f, 0.0f, 0.0f);  // Look-at target
+    glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);  // Up direction
 
     void initializeLights();
     void paintLSystem();

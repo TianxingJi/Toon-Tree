@@ -212,9 +212,9 @@ void MainWindow::initialize() {
     connectUIElements();
 
     // Set default values of 5 for tesselation parameters
-    onValChangeP1(5);
-    onValChangeP2(5);
-    onValChangeP3(5);
+    onValChangeP1(1);
+    onValChangeP2(1);
+    onValChangeP3(1);
 
     // Set default values for near and far planes
     onValChangeNearBox(0.1f);

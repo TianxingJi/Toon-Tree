@@ -75,6 +75,7 @@ qt6_add_resources(${PROJECT_NAME} "Resources"
     PREFIX
         "/"
     FILES
+        resources/images/treeTrunk.jpg
         resources/shaders/phong.frag
         resources/shaders/phong.vert
         resources/shaders/texture.frag

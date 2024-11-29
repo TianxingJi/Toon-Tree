@@ -1,4 +1,5 @@
 #include "realtime.h"
+#include "shapes/vbogenerator.h"
 #include <iostream>
 #include <stack>
 #include <glm/glm.hpp>
@@ -50,7 +51,6 @@ void Realtime::initializeLights() {
 
 void Realtime::interpretLSystem(const std::string& lSystemString, float angle, float length) {
     m_shapeData.clear();
-    std::vector<GLfloat> vertices; // Store vertices for lines
 
     // Initialize turtle state and stack
     std::stack<TurtleState> stateStack;
@@ -58,15 +58,45 @@ void Realtime::interpretLSystem(const std::string& lSystemString, float angle, f
 
     for (char c : lSystemString) {
         switch (c) {
-        case 'F': { // Move forward in the grow direction
+        case 'F': { // Create a trunk or branch
             glm::vec3 newPosition = turtle.position + turtle.growDirection * length;
-            drawLine(turtle.position, newPosition, vertices);
+
+            std::vector<GLfloat> trunkVertices;
+            generateShape(PrimitiveType::PRIMITIVE_CYLINDER, trunkVertices);
+
+            glm::mat4 modelMatrix = calculateModelMatrix(turtle.position, newPosition);
+
+            createShapeData(
+                trunkVertices,
+                glm::vec4(0.4f, 0.2f, 0.1f, 1.0f), // Trunk ambient color
+                glm::vec4(0.5f, 0.3f, 0.2f, 1.0f), // Trunk diffuse color
+                glm::vec4(0.6f, 0.4f, 0.3f, 1.0f), // Trunk specular color
+                32.0f,                              // Shininess
+                m_trunk_texture, // Texture
+                modelMatrix                     // Model matrix
+                );
+
             turtle.position = newPosition;
             break;
         }
-        case 'X': { // Draw the root
+        case 'X': { // Create a root or thinner branch
             glm::vec3 newPosition = turtle.position + turtle.growDirection * (length * 0.5f);
-            drawLine(turtle.position, newPosition, vertices);
+
+            std::vector<GLfloat> rootVertices;
+            generateShape(PrimitiveType::PRIMITIVE_CYLINDER, rootVertices);
+
+            glm::mat4 modelMatrix = calculateModelMatrix(turtle.position, newPosition);
+
+            createShapeData(
+                rootVertices,
+                glm::vec4(0.4f, 0.3f, 0.2f, 1.0f), // Root ambient color
+                glm::vec4(0.5f, 0.4f, 0.3f, 1.0f), // Root diffuse color
+                glm::vec4(0.7f, 0.5f, 0.4f, 1.0f), // Root specular color
+                16.0f,                              // Shininess
+                0,  // Texture
+                modelMatrix                      // Model matrix
+                );
+
             turtle.position = newPosition;
             break;
         }
@@ -121,57 +151,99 @@ void Realtime::interpretLSystem(const std::string& lSystemString, float angle, f
             break;
         }
     }
+}
 
-    // Generate VAO/VBO for the collected vertices
-    ShapeData lineShape;
-    glGenVertexArrays(1, &lineShape.vao);
-    glGenBuffers(1, &lineShape.vbo);
+void Realtime::generateShape(PrimitiveType type, std::vector<GLfloat> &vertices) {
+    vertices.clear(); // Clear any previous vertices
+    int phiTess = 12; // Number of slices
+    int thetaTess = 12; // Number of stacks
 
-    glBindVertexArray(lineShape.vao);
-    glBindBuffer(GL_ARRAY_BUFFER, lineShape.vbo);
+    // Generate base shape data (object space)
+    generateVBOBasedOnType(phiTess, thetaTess, vertices, type);
+}
+
+glm::mat4 Realtime::calculateModelMatrix(const glm::vec3 &start, const glm::vec3 &end) {
+    glm::vec3 direction = glm::normalize(end - start);
+    glm::vec3 up(0.0f, 1.0f, 0.0f);
+
+    // 如果方向与 `up` 平行，使用备用向量
+    if (glm::length(glm::cross(direction, up)) < 0.001f) {
+        up = glm::vec3(1.0f, 0.0f, 0.0f);
+    }
+
+    glm::vec3 right = glm::normalize(glm::cross(up, direction));
+    up = glm::normalize(glm::cross(direction, right));
+
+    // 生成旋转矩阵
+    glm::mat4 rotationMatrix(1.0f);
+    rotationMatrix[0] = glm::vec4(right, 0.0f);
+    rotationMatrix[1] = glm::vec4(direction, 0.0f);
+    rotationMatrix[2] = glm::vec4(up, 0.0f);
+
+    // 生成缩放矩阵：沿 `y` 方向按长度缩放
+    float scaleLength = glm::length(end - start);
+    glm::mat4 scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f, scaleLength, 0.1f)); // 横向粗细为0.1
+
+    // 生成平移矩阵：将底部对齐到 `start` 点
+    glm::mat4 translationMatrix = glm::translate(glm::mat4(1.0f), start + 0.5f * scaleLength * direction);
+
+    // 最终的 `modelMatrix`：先缩放，再旋转，最后平移
+    return translationMatrix * rotationMatrix * scalingMatrix;
+}
+
+void Realtime::createShapeData(
+    const std::vector<GLfloat>& vertices,
+    const glm::vec4& ambientColor,
+    const glm::vec4& diffuseColor,
+    const glm::vec4& specularColor,
+    float shininess,
+    const GLuint& texture,
+    const glm::mat4& modelMatrix)
+{
+    ShapeData shapeData;
+
+    // Generate VAO and VBO
+    glGenVertexArrays(1, &shapeData.vao);
+    glGenBuffers(1, &shapeData.vbo);
+
+    glBindVertexArray(shapeData.vao);
+    glBindBuffer(GL_ARRAY_BUFFER, shapeData.vbo);
     glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(GLfloat), vertices.data(), GL_STATIC_DRAW);
 
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void*)0);
+    // Define vertex attributes
+    glEnableVertexAttribArray(0); // Vertex position
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), reinterpret_cast<void *>(0));
 
-    glEnableVertexAttribArray(1); // For normal vectors
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
+    glEnableVertexAttribArray(1); // Normals
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), reinterpret_cast<void *>(3 * sizeof(GLfloat)));
 
-    lineShape.vertexCount = vertices.size() / 6;
+    glEnableVertexAttribArray(2); // UV coordinates
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), reinterpret_cast<void *>(6 * sizeof(GLfloat)));
+
+    shapeData.vertexCount = vertices.size() / 8;
 
     // Set material properties
-    lineShape.ambient = glm::vec4(1.f, 0.f, 0.f, 1.0f); // Example color
-    lineShape.diffuse = glm::vec4(0.6f, 0.6f, 0.6f, 1.0f);
-    lineShape.specular = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-    lineShape.shininess = 32.0f;
+    shapeData.ambient = ambientColor;
+    shapeData.diffuse = diffuseColor;
+    shapeData.specular = specularColor;
+    shapeData.shininess = shininess;
 
-    lineShape.modelMatrix = glm::mat4(1.0f); // Identity matrix for now
-    m_shapeData.push_back(lineShape);
+    // Use provided texture
+    if (texture != 0) {
+        shapeData.textureUsed = true;
+        shapeData.diffuseTexture = texture;
+    } else {
+        shapeData.textureUsed = false;
+    }
+
+    shapeData.modelMatrix = modelMatrix;
+
+    // Store in shape data list
+    m_shapeData.push_back(shapeData);
 
     // Cleanup
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
-}
-
-void Realtime::drawLine(const glm::vec3& start, const glm::vec3& end, std::vector<GLfloat>& vertices) {
-    // Define a default normal vector for the line (assume it's in the Z direction for 2D L-System)
-    glm::vec3 normal(0.0f, 0.0f, 1.0f);
-
-    // Add start vertex: position + normal
-    vertices.push_back(start.x);
-    vertices.push_back(start.y);
-    vertices.push_back(start.z);
-    vertices.push_back(normal.x);
-    vertices.push_back(normal.y);
-    vertices.push_back(normal.z);
-
-    // Add end vertex: position + normal
-    vertices.push_back(end.x);
-    vertices.push_back(end.y);
-    vertices.push_back(end.z);
-    vertices.push_back(normal.x);
-    vertices.push_back(normal.y);
-    vertices.push_back(normal.z);
 }
 
 void Realtime::paintLSystem() {
@@ -224,7 +296,30 @@ void Realtime::paintLSystem() {
         // Set model matrix
         glUniformMatrix4fv(glGetUniformLocation(m_shader, "modelMatrix"), 1, GL_FALSE, &shape.modelMatrix[0][0]);
 
-        glDrawArrays(GL_LINES, 0, shape.vertexCount);
+        if (shape.textureUsed) {
+            // Pass the textureUsed uniform
+            GLint textureUsedLocation = glGetUniformLocation(m_shader, "textureUsed");
+            glUniform1i(textureUsedLocation, true); // Set to true
+
+            // Pass the texture to shader (already bound to slot 1 as per your setup)
+            GLint textureLocation = glGetUniformLocation(m_shader, "Texture");
+            glActiveTexture(GL_TEXTURE1); // Set the active texture slot
+            glBindTexture(GL_TEXTURE_2D, shape.diffuseTexture);
+            glUniform1i(textureLocation, 1); // Slot 1
+
+            // Pass blend value
+            GLint blendLocation = glGetUniformLocation(m_shader, "blend");
+            glUniform1f(blendLocation, shape.blend);
+
+            // Pass repeatU and repeatV values
+            GLint repeatULocation = glGetUniformLocation(m_shader, "repeatU");
+            glUniform1f(repeatULocation, shape.repeatU);
+
+            GLint repeatVLocation = glGetUniformLocation(m_shader, "repeatV");
+            glUniform1f(repeatVLocation, shape.repeatV);
+        }
+
+        glDrawArrays(GL_TRIANGLES, 0, shape.vertexCount);
 
         glBindVertexArray(0);
     }

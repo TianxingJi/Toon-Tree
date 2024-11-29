@@ -69,7 +69,16 @@ public:
     void LSystemShapeDataGeneration();
     void lSystemGeneration();
     void interpretLSystem(const std::string& lSystemString, float angle, float length);
-    void drawLine(const glm::vec3& start, const glm::vec3& end, std::vector<GLfloat>& vertices);
+    void generateShape(PrimitiveType type, std::vector<GLfloat> &vertices);
+    glm::mat4 calculateModelMatrix(const glm::vec3 &start, const glm::vec3 &end);
+    void createShapeData(
+        const std::vector<GLfloat>& vertices,
+        const glm::vec4& ambientColor,
+        const glm::vec4& diffuseColor,
+        const glm::vec4& specularColor,
+        float shininess,
+        const GLuint& texture,
+        const glm::mat4& modelMatrix);
 
     void settingsChanged();
     void saveViewportImage(std::string filePath);
@@ -113,6 +122,9 @@ private:
     glm::mat4 m_model = glm::mat4(1);
     glm::mat4 m_view  = glm::mat4(1);
     glm::mat4 m_proj  = glm::mat4(1);
+    GLuint m_trunk_texture;
+    GLuint m_branch_texture;
+    GLuint m_leaf_texture;
 
     // Camera parameters
     glm::vec3 eye = glm::vec3(0.0f, 0.0f, 3.0f);  // Default camera position

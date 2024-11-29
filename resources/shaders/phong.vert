@@ -4,12 +4,13 @@
 //         the `layout` and `in` keywords.
 layout(location = 0) in vec3 objectSpacePosition;
 layout(location = 1) in vec3 objectSpaceNormal;
+layout(location = 2) in vec2 uv;        // UV coordinates
 
 // Task 5: declare `out` variables for the world-space position and normal,
 //         to be passed to the fragment shader
 out vec3 worldSpacePosition;
 out vec3 worldSpaceNormal;
-// out vec2 TexCoords; // Pass UV coordinates to fragment shader
+out vec2 TexCoords; // Pass UV coordinates to fragment shader
 
 // Task 6: declare a uniform mat4 to store model matrix
 uniform mat4 modelMatrix;
@@ -20,6 +21,7 @@ uniform mat4 viewMatrix;
 uniform mat4 projMatrix;
 
 void main() {
+    TexCoords = uv; // Pass UV to fragment shader
     // Task 8: compute the world-space position and normal, then pass them to
     //         the fragment shader using the variables created in task 5
     worldSpacePosition = vec3(modelMatrix * vec4(objectSpacePosition, 1.f)) ;

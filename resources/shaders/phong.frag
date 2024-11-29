@@ -20,6 +20,7 @@ struct Light {
 //         received post-interpolation from the vertex shader
 in vec3 worldSpacePosition;
 in vec3 worldSpaceNormal;
+in vec2 TexCoords; // Interpolated UV coordinates from vertex shader
 
 // Task 10: declare an out vec4 for your output color
 out vec4 fragColor;
@@ -31,6 +32,11 @@ uniform float ka;
 
 // Task 13: declare relevant uniform(s) here, for diffuse lighting
 uniform float kd;
+uniform bool textureUsed; // Whether use texture map
+uniform sampler2D Texture; // Texture uniform
+uniform float blend;
+uniform float repeatU;
+uniform float repeatV;
 uniform vec4 lightPosition;
 
 // Task 14: declare relevant uniform(s) here, for specular lighting
@@ -104,6 +110,12 @@ void main() {
          // Diffuse lighting
          float diffuseFactor = max(dot(normal, lightDir), 0.0);
          vec4 blendedDiffuse =  kd * material.diffuse; // Set up for Texture Mapping
+
+         if (textureUsed) { // if there is need to do texture map
+             vec2 repeatedTexCoords = vec2(TexCoords.x * repeatU, TexCoords.y * repeatV);
+             vec4 textureColor = texture(Texture, repeatedTexCoords);
+             blendedDiffuse = (1.0f - blend) * blendedDiffuse + blend * textureColor;
+         }
 
          vec4 diffuseColor = blendedDiffuse * diffuseFactor;
          fragColor += attenuationFactor * lightData.color * diffuseColor;

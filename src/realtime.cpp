@@ -91,6 +91,34 @@ void Realtime::initializeGL() { // TODO: m_Data should be finished
     // generateShapeData();
     initializeLights();
 
+    // Prepare filepath
+    QString treeTrunk_filepath = QString(":/resources/images/treeTrunk.jpg");
+
+    // Task 1: Obtain image from filepath
+    m_image = QImage(treeTrunk_filepath);
+
+    // Task 2: Format image to fit OpenGL
+    m_image = m_image.convertToFormat(QImage::Format_RGBA8888).mirrored();
+
+    // Task 3: Generate kitten texture
+    glGenTextures(1, &m_trunk_texture);
+
+    // Task 9: Set the active texture slot to texture slot 0
+    glActiveTexture(GL_TEXTURE0);
+
+    // Task 4: Bind kitten texture
+    glBindTexture(GL_TEXTURE_2D, m_trunk_texture);
+
+    // Task 5: Load image into kitten texture
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image.width(), m_image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_image.bits());
+
+    // Task 6: Set min and mag filters' interpolation mode to linear
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    // Task 7: Unbind kitten texture
+    glBindTexture(GL_TEXTURE_2D, 0);
+
     // Set up for the frame buffer object
     // Task 10: Set the texture.frag uniform for our texture
     glUseProgram(m_texture_shader);
@@ -101,6 +129,14 @@ void Realtime::initializeGL() { // TODO: m_Data should be finished
 
     glUseProgram(0);
 
+    // Set the phong.frag uniform for our texture
+    glUseProgram(m_shader);
+
+    GLint textureMapLocation = glGetUniformLocation(m_shader, "Texture");
+
+    glUniform1i(textureMapLocation, 1);
+
+    glUseProgram(0);
 
     std::vector<GLfloat> fullscreen_quad_data =
         { // POSITIONS       // UV COORDINATES
@@ -294,9 +330,6 @@ void Realtime::LSystemShapeDataGeneration() {
     // Set angle and length based on user parameters
     float angle = 25.0f * settings.shapeParameter3;    // Base angle
     float length = settings.shapeParameter2 * 0.1f;   // Segment length
-
-    // Debug: Print the L-System string
-    std::cout << "Generated L-System String: " << lSystemString.substr(0, 500) << "...\n";
 
     // Interpret the generated L-System string to create geometry
     interpretLSystem(lSystemString, angle, length);

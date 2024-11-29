@@ -120,11 +120,17 @@
 			"sourceIndexes" : 
 			[
 				0,
-				1,
 				2,
 				3,
 				4,
 				5
+			]
+		},
+		{
+			"name" : "Resources",
+			"sourceIndexes" : 
+			[
+				1
 			]
 		}
 	],
@@ -138,8 +144,8 @@
 		},
 		{
 			"backtrace" : 6,
-			"path" : "resources/images",
-			"sourceGroupIndex" : 0
+			"path" : "resources/images/treeTrunk.jpg",
+			"sourceGroupIndex" : 1
 		},
 		{
 			"backtrace" : 8,

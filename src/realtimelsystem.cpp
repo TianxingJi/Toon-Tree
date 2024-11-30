@@ -58,22 +58,48 @@ void Realtime::interpretLSystem(const std::string& lSystemString, float angle, f
 
     for (char c : lSystemString) {
         switch (c) {
+        case 'B': { // Create a base or soil
+            // Define the size and position of the base
+            glm::vec3 baseSize = glm::vec3(length * 10, length * 0.2f, length * 10); // Base dimensions
+            glm::vec3 basePosition = turtle.position - glm::vec3(0.0f, baseSize.y / 2.0f, 0.0f); // Place base below current position
+
+            // Generate cube geometry
+            std::vector<GLfloat> baseVertices;
+            generateShape(PrimitiveType::PRIMITIVE_CUBE, baseVertices);
+
+            // Calculate model matrix for the base
+            glm::mat4 modelMatrix = glm::translate(glm::mat4(1.0f), basePosition) *
+                                    glm::scale(glm::mat4(1.0f), baseSize);
+
+            // Add the base to the scene
+            createShapeData(
+                baseVertices,
+                glm::vec4(0.2f, 0.1f, 0.0f, 1.0f), // Dark brown color for soil
+                glm::vec4(0.3f, 0.2f, 0.1f, 1.0f), // Diffuse color
+                glm::vec4(0.1f, 0.1f, 0.1f, 1.0f), // Specular color
+                16.0f,                              // Shininess
+                m_ground_texture,                     // Base texture (if available)
+                modelMatrix                         // Model matrix
+                );
+
+            break;
+        }
         case 'F': { // Create a trunk or branch
             glm::vec3 newPosition = turtle.position + turtle.growDirection * length;
 
             std::vector<GLfloat> trunkVertices;
             generateShape(PrimitiveType::PRIMITIVE_CYLINDER, trunkVertices);
 
-            glm::mat4 modelMatrix = calculateModelMatrix(turtle.position, newPosition, 0.01f);
+            glm::mat4 modelMatrix = calculateModelMatrix(turtle.position, newPosition, 0.02f);
 
             createShapeData(
                 trunkVertices,
-                glm::vec4(0.4f, 1.f, 0.1f, 1.0f), // Trunk ambient color
-                glm::vec4(0.5f, 0.3f, 0.2f, 1.0f), // Trunk diffuse color
-                glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), // Trunk specular color
-                50.0f,                              // Shininess
-                0, // Texture
-                modelMatrix                     // Model matrix
+                glm::vec4(0.4f, 0.3f, 0.2f, 1.0f), // Root ambient color
+                glm::vec4(0.5f, 0.4f, 0.3f, 1.0f), // Root diffuse color
+                glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), // Root specular color
+                32.0f,                              // Shininess
+                m_trunk_texture,  // Texture
+                modelMatrix                      // Model matrix
                 );
 
             turtle.position = newPosition;
@@ -82,18 +108,39 @@ void Realtime::interpretLSystem(const std::string& lSystemString, float angle, f
         case 'X': { // Create a root or thinner branch
             glm::vec3 newPosition = turtle.position + turtle.growDirection * (length * 0.5f);
 
-            std::vector<GLfloat> rootVertices;
-            generateShape(PrimitiveType::PRIMITIVE_CYLINDER, rootVertices);
+            std::vector<GLfloat> branchVertices;
+            generateShape(PrimitiveType::PRIMITIVE_CYLINDER, branchVertices);
 
-            glm::mat4 modelMatrix = calculateModelMatrix(turtle.position, newPosition, 0.1f);
+            glm::mat4 modelMatrix = calculateModelMatrix(turtle.position, newPosition, 0.02f);
 
             createShapeData(
-                rootVertices,
+                branchVertices,
                 glm::vec4(0.4f, 0.3f, 0.2f, 1.0f), // Root ambient color
                 glm::vec4(0.5f, 0.4f, 0.3f, 1.0f), // Root diffuse color
                 glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), // Root specular color
                 32.0f,                              // Shininess
                 m_trunk_texture,  // Texture
+                modelMatrix                      // Model matrix
+                );
+
+            turtle.position = newPosition;
+            break;
+        }
+        case 'L': { // Create a leaf
+            glm::vec3 newPosition = turtle.position + turtle.growDirection * (length * 0.5f);
+
+            std::vector<GLfloat> leafVertices;
+            generateShape(PrimitiveType::PRIMITIVE_CONE, leafVertices); // Use cone as leaf
+
+            glm::mat4 modelMatrix = calculateModelMatrix(turtle.position, newPosition, 0.1f);
+
+            createShapeData(
+                leafVertices,
+                glm::vec4(0.0f, 0.8f, 0.0f, 1.0f), // Leaf ambient color
+                glm::vec4(0.1f, 0.9f, 0.1f, 1.0f), // Leaf diffuse color
+                glm::vec4(0.5f, 0.5f, 0.5f, 1.0f), // Leaf specular color
+                16.0f,                              // Shininess
+                m_leaf_texture,  // Leaf texture
                 modelMatrix                      // Model matrix
                 );
 

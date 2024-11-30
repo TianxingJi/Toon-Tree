@@ -91,33 +91,10 @@ void Realtime::initializeGL() { // TODO: m_Data should be finished
     // generateShapeData();
     initializeLights();
 
-    // Prepare filepath
-    QString treeTrunk_filepath = QString(":/resources/images/treeTrunk.jpg");
-
-    // Task 1: Obtain image from filepath
-    m_image = QImage(treeTrunk_filepath);
-
-    // Task 2: Format image to fit OpenGL
-    m_image = m_image.convertToFormat(QImage::Format_RGBA8888).mirrored();
-
-    // Task 3: Generate kitten texture
-    glGenTextures(1, &m_trunk_texture);
-
-    // Task 9: Set the active texture slot to texture slot 0
-    glActiveTexture(GL_TEXTURE0);
-
-    // Task 4: Bind kitten texture
-    glBindTexture(GL_TEXTURE_2D, m_trunk_texture);
-
-    // Task 5: Load image into kitten texture
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image.width(), m_image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_image.bits());
-
-    // Task 6: Set min and mag filters' interpolation mode to linear
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    // Task 7: Unbind kitten texture
-    glBindTexture(GL_TEXTURE_2D, 0);
+    // load texture
+    loadTexture(":/resources/images/treeTrunk.jpg", m_trunk_texture);
+    loadTexture(":/resources/images/treeLeaf.png", m_leaf_texture);
+    loadTexture(":/resources/images/ground.jpeg", m_ground_texture);
 
     // Set up for the frame buffer object
     // Task 10: Set the texture.frag uniform for our texture
@@ -171,6 +148,36 @@ void Realtime::initializeGL() { // TODO: m_Data should be finished
     // L System Logic Below
     m_view = glm::lookAt(eye, center, up);
     m_proj = glm::perspective(glm::radians(30.0f), static_cast<float>(m_width) / m_height, settings.nearPlane, settings.farPlane);
+}
+
+void Realtime::loadTexture(const std::string& filepath, GLuint& texture){
+    // Prepare filepath
+    QString qfilepath = QString::fromStdString(filepath);
+
+    // Task 1: Obtain image from filepath
+    m_image = QImage(qfilepath);
+
+    // Task 2: Format image to fit OpenGL
+    m_image = m_image.convertToFormat(QImage::Format_RGBA8888).mirrored();
+
+    // Task 3: Generate kitten texture
+    glGenTextures(1, &texture);
+
+    // Task 9: Set the active texture slot to texture slot 0
+    glActiveTexture(GL_TEXTURE0);
+
+    // Task 4: Bind kitten texture
+    glBindTexture(GL_TEXTURE_2D, texture);
+
+    // Task 5: Load image into kitten texture
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image.width(), m_image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_image.bits());
+
+    // Task 6: Set min and mag filters' interpolation mode to linear
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    // Task 7: Unbind kitten texture
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void Realtime::makeFBO(){
@@ -313,23 +320,25 @@ void Realtime::sceneChanged() {
 void Realtime::LSystemShapeDataGeneration() {
     clearShapeData(m_shapeData);
 
-    // Define the axiom and 3D branching rules
-    std::string axiom = "X";
+    // Define the axiom (tree starts with a trunk)
+    std::string axiom = "BFFFX";
+
     std::unordered_map<char, std::string> rules = {
-        {'X', "XXXF"},  // 3D branching with all operators
-        {'F', "FF"}                       // Rule for elongation
+        {'X', "X/-[-XL+XL+XL]+[+XL-XL-XL][&XL][^XL]\\"},
+        {'F', "F"},
+        {'L', "LX"}
     };
 
-    // Set the number of iterations
-    int iterations = settings.shapeParameter1;
+    // Set the number of iterations (use fixed value for testing or user parameters)
+    int iterations = settings.shapeParameter1; // Number of iterations to generate the tree structure
 
     // Generate the L-System string
     LSystem lSystem(axiom, rules, iterations);
     std::string lSystemString = lSystem.generate();
 
     // Set angle and length based on user parameters
-    float angle = 25.0f * settings.shapeParameter3;    // Base angle
-    float length = settings.shapeParameter2 * 0.1f;   // Segment length
+    float angle = 5.5f * settings.shapeParameter3;    // Base angle
+    float length = settings.shapeParameter2 * 0.1f;    // Segment length
 
     // Interpret the generated L-System string to create geometry
     interpretLSystem(lSystemString, angle, length);

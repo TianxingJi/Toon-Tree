@@ -1,82 +1,62 @@
 # ninja log v6
-551	2001	1732910590465399618	CMakeFiles/projects_realtime.dir/src/realtimegeometry.cpp.o	2cb19847e3ca1b36
-98	1839	1732911923319491121	CMakeFiles/projects_realtime.dir/src/mainwindow.cpp.o	16f2ab7fad7f9faa
+435	1741	1732930615040425401	CMakeFiles/projects_realtime.dir/src/realtimegeometry.cpp.o	2cb19847e3ca1b36
+32	1160	1732932814302069465	CMakeFiles/projects_realtime.dir/src/mainwindow.cpp.o	16f2ab7fad7f9faa
 39788	40567	1732758092056354140	CMakeFiles/projects_realtime.dir/src/shapes/cone.cpp.o	239e3c5c6e8b87c7
-550	2145	1732910590464401247	CMakeFiles/projects_realtime.dir/projects_realtime_autogen/mocs_compilation.cpp.o	9037b00bb92fb08f
-41	1419	1732912135722590370	CMakeFiles/projects_realtime.dir/src/realtimelsystem.cpp.o	e2ea8ea0fa23013
-551	2089	1732910590464635163	CMakeFiles/projects_realtime.dir/src/main.cpp.o	7fb25741dcf2eaee
-527	1264	1732762268855722252	CMakeFiles/projects_realtime.dir/src/lsystem/lsystem.cpp.o	4d95df75a34af8a5
+434	1713	1732930615039482239	CMakeFiles/projects_realtime.dir/projects_realtime_autogen/mocs_compilation.cpp.o	9037b00bb92fb08f
+33	1092	1732941655747248218	CMakeFiles/projects_realtime.dir/src/realtimelsystem.cpp.o	e2ea8ea0fa23013
+434	1696	1732930615039651113	CMakeFiles/projects_realtime.dir/src/main.cpp.o	7fb25741dcf2eaee
+33	379	1732933906353768801	CMakeFiles/projects_realtime.dir/src/lsystem/lsystem.cpp.o	4d95df75a34af8a5
 39788	40570	1732758092055666677	CMakeFiles/projects_realtime.dir/src/shapes/cylinder.cpp.o	b7f76da4d515ee3b
-10	28	1732847408963684112	/Users/tevenji/Desktop/Brown CSCI 1230:2230/Toon-Tree/build/build-Toon-Tree-Qt_6_7_3_for_macOS-Release/StaticGLEW_autogen/timestamp	bc2cb7c482c89cdc
+10	30	1732930234172327509	/Users/tevenji/Desktop/Brown CSCI 1230:2230/Toon-Tree/build/build-Toon-Tree-Qt_6_7_3_for_macOS-Release/StaticGLEW_autogen/timestamp	bc2cb7c482c89cdc
 581	1154	1732819244605847190	CMakeFiles/projects_realtime.dir/src/settings.cpp.o	392b11156e87b6f9
 581	1384	1732819244606022692	CMakeFiles/projects_realtime.dir/src/camera/camera.cpp.o	eded76611277c0cd
 39788	40561	1732758092055366467	CMakeFiles/projects_realtime.dir/src/shapes/sphere.cpp.o	187c0ac71d500c94
-10	28	1732847408963684112	/Users/tevenji/Desktop/Brown CSCI 1230:2230/Toon-Tree/build/build-Toon-Tree-Qt_6_7_3_for_macOS-Release/StaticGLEW_autogen/mocs_compilation.cpp	bc2cb7c482c89cdc
-15	2004	1732909336131667467	/Users/tevenji/Desktop/Brown CSCI 1230:2230/Toon-Tree/build/build-Toon-Tree-Qt_6_7_3_for_macOS-Release/.qt/rcc/qrc_Resources.cpp	8d370c294dd367fe
+10	30	1732930234172327509	/Users/tevenji/Desktop/Brown CSCI 1230:2230/Toon-Tree/build/build-Toon-Tree-Qt_6_7_3_for_macOS-Release/StaticGLEW_autogen/mocs_compilation.cpp	bc2cb7c482c89cdc
+51	1398	1732930235555633422	/Users/tevenji/Desktop/Brown CSCI 1230:2230/Toon-Tree/build/build-Toon-Tree-Qt_6_7_3_for_macOS-Release/.qt/rcc/qrc_Resources.cpp	8d370c294dd367fe
 39787	40537	1732758092054923756	CMakeFiles/projects_realtime.dir/src/shapes/cube.cpp.o	97d9b4038d22c126
-12	40	1732912135693617659	/Users/tevenji/Desktop/Brown CSCI 1230:2230/Toon-Tree/build/build-Toon-Tree-Qt_6_7_3_for_macOS-Release/projects_realtime_autogen/timestamp	440024498fc480b6
-551	2402	1732910590464888870	CMakeFiles/projects_realtime.dir/src/realtime.cpp.o	e8cdc0436a66beac
+9	31	1732941698767202216	/Users/tevenji/Desktop/Brown CSCI 1230:2230/Toon-Tree/build/build-Toon-Tree-Qt_6_7_3_for_macOS-Release/projects_realtime_autogen/timestamp	440024498fc480b6
+32	1187	1732941698790177697	CMakeFiles/projects_realtime.dir/src/realtime.cpp.o	e8cdc0436a66beac
 65	39111	1732758052332290782	CMakeFiles/StaticGLEW.dir/glew/src/glew.c.o	c8055e7e3e9c5586
-1419	1571	1732912137100669398	projects_realtime	560e27514b0f8233
+1187	1306	1732941699945644271	projects_realtime	560e27514b0f8233
 39787	41355	1732758092054575795	CMakeFiles/projects_realtime.dir/src/utils/sceneparser.cpp.o	26ffa7c2bb029710
-10	28	1732847408963684112	StaticGLEW_autogen/mocs_compilation.cpp	bc2cb7c482c89cdc
-12	40	1732912135693617659	projects_realtime_autogen/timestamp	440024498fc480b6
-2004	36476	1732909336139763763	CMakeFiles/projects_realtime.dir/build/build-Toon-Tree-Qt_6_7_3_for_macOS-Release/.qt/rcc/qrc_Resources.cpp.o	257c087a4d8028a5
+10	30	1732930234172327509	StaticGLEW_autogen/mocs_compilation.cpp	bc2cb7c482c89cdc
+9	31	1732941698767202216	projects_realtime_autogen/timestamp	440024498fc480b6
+1399	27334	1732930235560804587	CMakeFiles/projects_realtime.dir/build/build-Toon-Tree-Qt_6_7_3_for_macOS-Release/.qt/rcc/qrc_Resources.cpp.o	257c087a4d8028a5
 65	87	1732758052332113406	CMakeFiles/StaticGLEW.dir/StaticGLEW_autogen/mocs_compilation.cpp.o	11f4e78bc944570e
-39787	42005	1732758092054416794	CMakeFiles/projects_realtime.dir/src/utils/scenefilereader.cpp.o	6c87af3a9ff1343a
 581	1532	1732819244606223069	CMakeFiles/projects_realtime.dir/src/utils/sceneloader.cpp.o	1d26964f5ee5cf04
-12	40	1732912135693617659	projects_realtime_autogen/mocs_compilation.cpp	440024498fc480b6
-12	40	1732912135693617659	/Users/tevenji/Desktop/Brown CSCI 1230:2230/Toon-Tree/build/build-Toon-Tree-Qt_6_7_3_for_macOS-Release/projects_realtime_autogen/mocs_compilation.cpp	440024498fc480b6
-15	2004	1732909336131667467	.qt/rcc/qrc_Resources.cpp	8d370c294dd367fe
-10	28	1732847408963684112	StaticGLEW_autogen/timestamp	bc2cb7c482c89cdc
+39787	42005	1732758092054416794	CMakeFiles/projects_realtime.dir/src/utils/scenefilereader.cpp.o	6c87af3a9ff1343a
+9	31	1732941698767202216	projects_realtime_autogen/mocs_compilation.cpp	440024498fc480b6
+9	31	1732941698767202216	/Users/tevenji/Desktop/Brown CSCI 1230:2230/Toon-Tree/build/build-Toon-Tree-Qt_6_7_3_for_macOS-Release/projects_realtime_autogen/mocs_compilation.cpp	440024498fc480b6
+51	1398	1732930235555633422	.qt/rcc/qrc_Resources.cpp	8d370c294dd367fe
+10	30	1732930234172327509	StaticGLEW_autogen/timestamp	bc2cb7c482c89cdc
 39111	39141	1732758091379299317	libStaticGLEW.a	f7a57836ab7e991
-12	42	1732912270912592991	projects_realtime_autogen/timestamp	440024498fc480b6
-12	42	1732912270912592991	projects_realtime_autogen/mocs_compilation.cpp	440024498fc480b6
-12	42	1732912270912592991	/Users/tevenji/Desktop/Brown CSCI 1230:2230/Toon-Tree/build/build-Toon-Tree-Qt_6_7_3_for_macOS-Release/projects_realtime_autogen/timestamp	440024498fc480b6
-12	42	1732912270912592991	/Users/tevenji/Desktop/Brown CSCI 1230:2230/Toon-Tree/build/build-Toon-Tree-Qt_6_7_3_for_macOS-Release/projects_realtime_autogen/mocs_compilation.cpp	440024498fc480b6
-43	1513	1732912270943317616	CMakeFiles/projects_realtime.dir/src/realtimelsystem.cpp.o	e2ea8ea0fa23013
-1513	1677	1732912272413243476	projects_realtime	560e27514b0f8233
-12	40	1732912726446581914	projects_realtime_autogen/timestamp	440024498fc480b6
-12	40	1732912726446581914	projects_realtime_autogen/mocs_compilation.cpp	440024498fc480b6
-12	40	1732912726446581914	/Users/tevenji/Desktop/Brown CSCI 1230:2230/Toon-Tree/build/build-Toon-Tree-Qt_6_7_3_for_macOS-Release/projects_realtime_autogen/timestamp	440024498fc480b6
-12	40	1732912726446581914	/Users/tevenji/Desktop/Brown CSCI 1230:2230/Toon-Tree/build/build-Toon-Tree-Qt_6_7_3_for_macOS-Release/projects_realtime_autogen/mocs_compilation.cpp	440024498fc480b6
-41	1460	1732912726476416707	CMakeFiles/projects_realtime.dir/src/realtimelsystem.cpp.o	e2ea8ea0fa23013
-1460	1614	1732912727895139095	projects_realtime	560e27514b0f8233
-12	41	1732912771809230322	projects_realtime_autogen/timestamp	440024498fc480b6
-12	41	1732912771809230322	projects_realtime_autogen/mocs_compilation.cpp	440024498fc480b6
-12	41	1732912771809230322	/Users/tevenji/Desktop/Brown CSCI 1230:2230/Toon-Tree/build/build-Toon-Tree-Qt_6_7_3_for_macOS-Release/projects_realtime_autogen/timestamp	440024498fc480b6
-12	41	1732912771809230322	/Users/tevenji/Desktop/Brown CSCI 1230:2230/Toon-Tree/build/build-Toon-Tree-Qt_6_7_3_for_macOS-Release/projects_realtime_autogen/mocs_compilation.cpp	440024498fc480b6
-42	1470	1732912771839196739	CMakeFiles/projects_realtime.dir/src/realtimelsystem.cpp.o	e2ea8ea0fa23013
-1470	1620	1732912773267140866	projects_realtime	560e27514b0f8233
-12	42	1732912806437759276	projects_realtime_autogen/timestamp	440024498fc480b6
-12	42	1732912806437759276	projects_realtime_autogen/mocs_compilation.cpp	440024498fc480b6
-12	42	1732912806437759276	/Users/tevenji/Desktop/Brown CSCI 1230:2230/Toon-Tree/build/build-Toon-Tree-Qt_6_7_3_for_macOS-Release/projects_realtime_autogen/timestamp	440024498fc480b6
-12	42	1732912806437759276	/Users/tevenji/Desktop/Brown CSCI 1230:2230/Toon-Tree/build/build-Toon-Tree-Qt_6_7_3_for_macOS-Release/projects_realtime_autogen/mocs_compilation.cpp	440024498fc480b6
-43	1458	1732912806469318066	CMakeFiles/projects_realtime.dir/src/realtimelsystem.cpp.o	e2ea8ea0fa23013
-1458	1605	1732912807883631794	projects_realtime	560e27514b0f8233
-16	607	1732913825502452000	projects_realtime_autogen/timestamp	440024498fc480b6
-16	607	1732913825502452000	projects_realtime_autogen/mocs_compilation.cpp	440024498fc480b6
-16	607	1732913825502452000	/Users/tevenji/Desktop/Brown CSCI 1230:2230/Toon-Tree/build/build-Toon-Tree-Qt_6_7_3_for_macOS-Release/projects_realtime_autogen/timestamp	440024498fc480b6
-16	607	1732913825502452000	/Users/tevenji/Desktop/Brown CSCI 1230:2230/Toon-Tree/build/build-Toon-Tree-Qt_6_7_3_for_macOS-Release/projects_realtime_autogen/mocs_compilation.cpp	440024498fc480b6
-608	1790	1732913825514568820	CMakeFiles/projects_realtime.dir/src/main.cpp.o	7fb25741dcf2eaee
-608	1793	1732913825514350819	CMakeFiles/projects_realtime.dir/projects_realtime_autogen/mocs_compilation.cpp.o	9037b00bb92fb08f
-609	1932	1732913825515443239	CMakeFiles/projects_realtime.dir/src/realtimegeometry.cpp.o	2cb19847e3ca1b36
-608	1986	1732913825515049446	CMakeFiles/projects_realtime.dir/src/mainwindow.cpp.o	16f2ab7fad7f9faa
-608	2153	1732913825514779320	CMakeFiles/projects_realtime.dir/src/realtime.cpp.o	e8cdc0436a66beac
-13	537	1732914092925993000	projects_realtime_autogen/timestamp	440024498fc480b6
-13	537	1732914092925993000	projects_realtime_autogen/mocs_compilation.cpp	440024498fc480b6
-13	537	1732914092925993000	/Users/tevenji/Desktop/Brown CSCI 1230:2230/Toon-Tree/build/build-Toon-Tree-Qt_6_7_3_for_macOS-Release/projects_realtime_autogen/timestamp	440024498fc480b6
-13	537	1732914092925993000	/Users/tevenji/Desktop/Brown CSCI 1230:2230/Toon-Tree/build/build-Toon-Tree-Qt_6_7_3_for_macOS-Release/projects_realtime_autogen/mocs_compilation.cpp	440024498fc480b6
-538	2012	1732914092937166589	CMakeFiles/projects_realtime.dir/projects_realtime_autogen/mocs_compilation.cpp.o	9037b00bb92fb08f
-538	2032	1732914092937467090	CMakeFiles/projects_realtime.dir/src/main.cpp.o	7fb25741dcf2eaee
-539	2167	1732914092937843299	CMakeFiles/projects_realtime.dir/src/mainwindow.cpp.o	16f2ab7fad7f9faa
-539	2279	1732914092938385384	CMakeFiles/projects_realtime.dir/src/realtimegeometry.cpp.o	2cb19847e3ca1b36
-539	2354	1732914092938143758	CMakeFiles/projects_realtime.dir/src/realtimelsystem.cpp.o	e2ea8ea0fa23013
-538	2367	1732914092937649757	CMakeFiles/projects_realtime.dir/src/realtime.cpp.o	e8cdc0436a66beac
-2367	2515	1732914094766732011	projects_realtime	560e27514b0f8233
-12	41	1732914657324549309	projects_realtime_autogen/timestamp	440024498fc480b6
-12	41	1732914657324549309	projects_realtime_autogen/mocs_compilation.cpp	440024498fc480b6
-12	41	1732914657324549309	/Users/tevenji/Desktop/Brown CSCI 1230:2230/Toon-Tree/build/build-Toon-Tree-Qt_6_7_3_for_macOS-Release/projects_realtime_autogen/timestamp	440024498fc480b6
-12	41	1732914657324549309	/Users/tevenji/Desktop/Brown CSCI 1230:2230/Toon-Tree/build/build-Toon-Tree-Qt_6_7_3_for_macOS-Release/projects_realtime_autogen/mocs_compilation.cpp	440024498fc480b6
-42	1568	1732914657354812688	CMakeFiles/projects_realtime.dir/src/realtime.cpp.o	e8cdc0436a66beac
-1568	1715	1732914658880768390	projects_realtime	560e27514b0f8233
+9	27	1732942043114692375	StaticGLEW_autogen/timestamp	bc2cb7c482c89cdc
+9	27	1732942043114692375	StaticGLEW_autogen/mocs_compilation.cpp	bc2cb7c482c89cdc
+9	27	1732942043114692375	/Users/tevenji/Desktop/Brown CSCI 1230:2230/Toon-Tree/build/build-Toon-Tree-Qt_6_7_3_for_macOS-Release/StaticGLEW_autogen/timestamp	bc2cb7c482c89cdc
+9	27	1732942043114692375	/Users/tevenji/Desktop/Brown CSCI 1230:2230/Toon-Tree/build/build-Toon-Tree-Qt_6_7_3_for_macOS-Release/StaticGLEW_autogen/mocs_compilation.cpp	bc2cb7c482c89cdc
+28	474	1732942043571274000	projects_realtime_autogen/timestamp	440024498fc480b6
+28	474	1732942043571274000	projects_realtime_autogen/mocs_compilation.cpp	440024498fc480b6
+28	474	1732942043571274000	/Users/tevenji/Desktop/Brown CSCI 1230:2230/Toon-Tree/build/build-Toon-Tree-Qt_6_7_3_for_macOS-Release/projects_realtime_autogen/timestamp	440024498fc480b6
+28	474	1732942043571274000	/Users/tevenji/Desktop/Brown CSCI 1230:2230/Toon-Tree/build/build-Toon-Tree-Qt_6_7_3_for_macOS-Release/projects_realtime_autogen/mocs_compilation.cpp	440024498fc480b6
+474	2021	1732942045120949995	.qt/rcc/qrc_Resources.cpp	8d370c294dd367fe
+474	2021	1732942045120949995	/Users/tevenji/Desktop/Brown CSCI 1230:2230/Toon-Tree/build/build-Toon-Tree-Qt_6_7_3_for_macOS-Release/.qt/rcc/qrc_Resources.cpp	8d370c294dd367fe
+2022	3158	1732942045127205478	CMakeFiles/projects_realtime.dir/src/realtimelsystem.cpp.o	e2ea8ea0fa23013
+2021	3164	1732942045126648479	CMakeFiles/projects_realtime.dir/src/main.cpp.o	7fb25741dcf2eaee
+2021	3182	1732942045126333855	CMakeFiles/projects_realtime.dir/projects_realtime_autogen/mocs_compilation.cpp.o	9037b00bb92fb08f
+2022	3231	1732942045127368103	CMakeFiles/projects_realtime.dir/src/realtimegeometry.cpp.o	2cb19847e3ca1b36
+2022	3297	1732942045126954854	CMakeFiles/projects_realtime.dir/src/mainwindow.cpp.o	16f2ab7fad7f9faa
+2022	3345	1732942045126797687	CMakeFiles/projects_realtime.dir/src/realtime.cpp.o	e8cdc0436a66beac
+2022	27955	1732942045127506144	CMakeFiles/projects_realtime.dir/build/build-Toon-Tree-Qt_6_7_3_for_macOS-Release/.qt/rcc/qrc_Resources.cpp.o	257c087a4d8028a5
+27955	28084	1732942071060152633	projects_realtime	560e27514b0f8233
+9	30	1732942159923025093	projects_realtime_autogen/timestamp	440024498fc480b6
+9	30	1732942159923025093	projects_realtime_autogen/mocs_compilation.cpp	440024498fc480b6
+9	30	1732942159923025093	/Users/tevenji/Desktop/Brown CSCI 1230:2230/Toon-Tree/build/build-Toon-Tree-Qt_6_7_3_for_macOS-Release/projects_realtime_autogen/timestamp	440024498fc480b6
+9	30	1732942159923025093	/Users/tevenji/Desktop/Brown CSCI 1230:2230/Toon-Tree/build/build-Toon-Tree-Qt_6_7_3_for_macOS-Release/projects_realtime_autogen/mocs_compilation.cpp	440024498fc480b6
+30	1126	1732942159944420453	CMakeFiles/projects_realtime.dir/src/realtimelsystem.cpp.o	e2ea8ea0fa23013
+1126	1244	1732942161039884519	projects_realtime	560e27514b0f8233
+9	32	1732942202789963496	projects_realtime_autogen/timestamp	440024498fc480b6
+9	32	1732942202789963496	projects_realtime_autogen/mocs_compilation.cpp	440024498fc480b6
+9	32	1732942202789963496	/Users/tevenji/Desktop/Brown CSCI 1230:2230/Toon-Tree/build/build-Toon-Tree-Qt_6_7_3_for_macOS-Release/projects_realtime_autogen/timestamp	440024498fc480b6
+9	32	1732942202789963496	/Users/tevenji/Desktop/Brown CSCI 1230:2230/Toon-Tree/build/build-Toon-Tree-Qt_6_7_3_for_macOS-Release/projects_realtime_autogen/mocs_compilation.cpp	440024498fc480b6
+32	1186	1732942202812836477	CMakeFiles/projects_realtime.dir/src/realtime.cpp.o	e8cdc0436a66beac
+1186	1306	1732942203966526556	projects_realtime	560e27514b0f8233

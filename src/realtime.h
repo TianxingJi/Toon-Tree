@@ -128,6 +128,8 @@ private:
     GLuint m_trunk_texture;
     GLuint m_branch_texture;
     GLuint m_leaf_texture;
+    GLuint m_ground_texture;
+    void loadTexture(const std::string& filepath, GLuint& texture);
 
     // Camera parameters
     glm::vec3 eye = glm::vec3(0.0f, 0.0f, 3.0f);  // Default camera position

@@ -140,7 +140,7 @@ private:
     void paintLSystem();
 
     // Task 30: Update the paintTexture function signature
-    void paintFBOTexture(GLuint texture, bool enablePerPixelFilter, bool enableKernelFilter, bool enablePerPixelFilter2, bool enableKernelFilter2);
+    void paintFBOTexture(GLuint texture, bool enablePerPixelFilter, bool enableKernelFilter);
 
     GLuint m_defaultFBO;
     int m_fbo_width;

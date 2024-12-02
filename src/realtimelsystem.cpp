@@ -63,7 +63,7 @@ void Realtime::interpretLSystem(const std::string& lSystemString, float angle, f
             glm::vec3 baseSize = glm::vec3(length * 10, length * 0.2f, length * 10); // Base dimensions
             glm::vec3 basePosition = turtle.position - glm::vec3(0.0f, baseSize.y / 2.0f, 0.0f); // Place base below current position
 
-            // Generate cube geometry
+            // Generate cube geometry for the base
             std::vector<GLfloat> baseVertices;
             generateShape(PrimitiveType::PRIMITIVE_CUBE, baseVertices);
 
@@ -78,9 +78,41 @@ void Realtime::interpretLSystem(const std::string& lSystemString, float angle, f
                 glm::vec4(0.3f, 0.2f, 0.1f, 1.0f), // Diffuse color
                 glm::vec4(0.1f, 0.1f, 0.1f, 1.0f), // Specular color
                 16.0f,                              // Shininess
-                m_ground_texture,                     // Base texture (if available)
+                m_ground_texture,                   // Base texture (if available)
                 modelMatrix                         // Model matrix
                 );
+
+            // // Generate grass in a grid pattern
+            // float grassSpacing = length; // Distance between grass instances
+            // int gridCount = 10;          // Number of grass instances in one row/column
+
+            // for (int i = -gridCount / 2; i <= gridCount / 2; ++i) {
+            //     for (int j = -gridCount / 2; j <= gridCount / 2; ++j) {
+            //         glm::vec3 grassPosition = basePosition + glm::vec3(i * grassSpacing, baseSize.y, j * grassSpacing);
+
+            //         // Define the size of each grass instance
+            //         glm::vec3 grassSize = glm::vec3(length * 0.1f, length * 0.5f, length * 0.1f); // Tall and thin
+
+            //         // Generate cone geometry (as grass)
+            //         std::vector<GLfloat> grassVertices;
+            //         generateShape(PrimitiveType::PRIMITIVE_CONE, grassVertices); // Use cone for grass
+
+            //         // Calculate model matrix for the grass
+            //         glm::mat4 grassModelMatrix = glm::translate(glm::mat4(1.0f), grassPosition) *
+            //                                      glm::scale(glm::mat4(1.0f), grassSize);
+
+            //         // Add the grass to the scene
+            //         createShapeData(
+            //             grassVertices,
+            //             glm::vec4(0.2f, 0.8f, 0.2f, 1.0f), // Green grass color
+            //             glm::vec4(0.3f, 0.9f, 0.3f, 1.0f), // Diffuse color
+            //             glm::vec4(0.5f, 0.5f, 0.5f, 1.0f), // Specular color
+            //             8.0f,                              // Shininess
+            //             0,                                 // No texture for now
+            //             grassModelMatrix                   // Model matrix
+            //             );
+            //     }
+            // }
 
             break;
         }
@@ -119,7 +151,7 @@ void Realtime::interpretLSystem(const std::string& lSystemString, float angle, f
                 glm::vec4(0.5f, 0.4f, 0.3f, 1.0f), // Root diffuse color
                 glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), // Root specular color
                 32.0f,                              // Shininess
-                m_trunk_texture,  // Texture
+                m_branch_texture,  // Texture
                 modelMatrix                      // Model matrix
                 );
 
@@ -130,7 +162,7 @@ void Realtime::interpretLSystem(const std::string& lSystemString, float angle, f
             glm::vec3 newPosition = turtle.position + turtle.growDirection * (length * 0.5f);
 
             std::vector<GLfloat> leafVertices;
-            generateShape(PrimitiveType::PRIMITIVE_CONE, leafVertices); // Use cone as leaf
+            generateShape(PrimitiveType::PRIMITIVE_CUBE, leafVertices); // Use cone as leaf
 
             glm::mat4 modelMatrix = calculateModelMatrix(turtle.position, newPosition, 0.1f);
 
@@ -159,26 +191,32 @@ void Realtime::interpretLSystem(const std::string& lSystemString, float angle, f
             turtle.rightDirection = glm::normalize(glm::cross(turtle.growDirection, turtle.forwardDirection));
             break;
         }
-        case '&': { // Rotate GrowDirection forward/backward (Pitch)
-            glm::mat4 rotationMatrix = customRotate(turtle.rightDirection, glm::radians(-angle));
-            turtle.growDirection = glm::normalize(glm::vec3(rotationMatrix * glm::vec4(turtle.growDirection, 0.0f)));
-            turtle.forwardDirection = glm::normalize(glm::cross(turtle.rightDirection, turtle.growDirection));
-            break;
-        }
-        case '^': { // Rotate GrowDirection backward/forward (Pitch, opposite)
-            glm::mat4 rotationMatrix = customRotate(turtle.rightDirection, glm::radians(angle));
-            turtle.growDirection = glm::normalize(glm::vec3(rotationMatrix * glm::vec4(turtle.growDirection, 0.0f)));
-            turtle.forwardDirection = glm::normalize(glm::cross(turtle.rightDirection, turtle.growDirection));
-            break;
-        }
-        case '/': { // Roll GrowDirection clockwise (Roll)
+        case '&': { // Roll GrowDirection clockwise (Roll)
             glm::mat4 rotationMatrix = customRotate(turtle.growDirection, glm::radians(-angle));
             turtle.forwardDirection = glm::normalize(glm::vec3(rotationMatrix * glm::vec4(turtle.forwardDirection, 0.0f)));
             turtle.rightDirection = glm::normalize(glm::cross(turtle.growDirection, turtle.forwardDirection));
             break;
         }
-        case '\\': { // Roll GrowDirection counter-clockwise (Roll, opposite)
+        case '^': { // Roll GrowDirection counter-clockwise (Roll, opposite)
             glm::mat4 rotationMatrix = customRotate(turtle.growDirection, glm::radians(angle));
+            turtle.forwardDirection = glm::normalize(glm::vec3(rotationMatrix * glm::vec4(turtle.forwardDirection, 0.0f)));
+            turtle.rightDirection = glm::normalize(glm::cross(turtle.growDirection, turtle.forwardDirection));
+            break;
+        }
+        case '<': { // Rotate GrowDirection forward/backward (Pitch)
+            glm::mat4 rotationMatrix = customRotate(turtle.rightDirection, glm::radians(-angle));
+            turtle.growDirection = glm::normalize(glm::vec3(rotationMatrix * glm::vec4(turtle.growDirection, 0.0f)));
+            turtle.forwardDirection = glm::normalize(glm::cross(turtle.rightDirection, turtle.growDirection));
+            break;
+        }
+        case '>': { // Rotate GrowDirection backward/forward (Pitch, opposite)
+            glm::mat4 rotationMatrix = customRotate(turtle.rightDirection, glm::radians(angle));
+            turtle.growDirection = glm::normalize(glm::vec3(rotationMatrix * glm::vec4(turtle.growDirection, 0.0f)));
+            turtle.forwardDirection = glm::normalize(glm::cross(turtle.rightDirection, turtle.growDirection));
+            break;
+        }
+        case '|': { // Turn around (Rotate 180 degrees)
+            glm::mat4 rotationMatrix = customRotate(turtle.growDirection, glm::radians(180.0f));
             turtle.forwardDirection = glm::normalize(glm::vec3(rotationMatrix * glm::vec4(turtle.forwardDirection, 0.0f)));
             turtle.rightDirection = glm::normalize(glm::cross(turtle.growDirection, turtle.forwardDirection));
             break;

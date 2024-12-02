@@ -48,6 +48,12 @@ void Realtime::finish() {
     glDeleteRenderbuffers(1, &m_fbo_renderbuffer);
     glDeleteFramebuffers(1, &m_fbo);
 
+
+    glDeleteTextures(1, &m_trunk_texture);
+    glDeleteTextures(1, &m_branch_texture);
+    glDeleteTextures(1, &m_leaf_texture);
+    glDeleteTextures(1, &m_ground_texture);
+
     this->doneCurrent();
 }
 
@@ -93,6 +99,7 @@ void Realtime::initializeGL() { // TODO: m_Data should be finished
 
     // load texture
     loadTexture(":/resources/images/treeTrunk.jpg", m_trunk_texture);
+    loadTexture(":/resources/images/treeTrunk.jpg", m_branch_texture);
     loadTexture(":/resources/images/treeLeaf.png", m_leaf_texture);
     loadTexture(":/resources/images/ground.jpeg", m_ground_texture);
 
@@ -234,17 +241,15 @@ void Realtime::paintGL() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Task 27: Call paintTexture to draw our FBO color attachment texture | Task 31: Set bool parameter to true
-    paintFBOTexture(m_fbo_texture, settings.perPixelFilter, settings.kernelBasedFilter, settings.extraCredit3, settings.extraCredit4);
+    paintFBOTexture(m_fbo_texture, settings.perPixelFilter, settings.kernelBasedFilter);
 }
 
 // Task 31: Update the paintTexture function signature
-void Realtime::paintFBOTexture(GLuint texture, bool enablePerPixelFilter, bool enableKernelFilter, bool enablePerPixelFilter2, bool enableKernelFilter2){
+void Realtime::paintFBOTexture(GLuint texture, bool enablePerPixelFilter, bool enableKernelFilter){
     glUseProgram(m_texture_shader);
     // Task 32: Set your bool uniform on whether or not to filter the texture drawn
     glUniform1f(glGetUniformLocation(m_texture_shader, "enablePerPixelFilter"), enablePerPixelFilter);
     glUniform1i(glGetUniformLocation(m_texture_shader, "enableKernelFilter"), enableKernelFilter);
-    glUniform1f(glGetUniformLocation(m_texture_shader, "enablePerPixelFilter2"), enablePerPixelFilter2);
-    glUniform1i(glGetUniformLocation(m_texture_shader, "enableKernelFilter2"), enableKernelFilter2);
 
     // Task: Calculate texelSize and pass it to the shader
     float texelWidth = 1.0f / static_cast<float>(m_fbo_width);
@@ -321,13 +326,18 @@ void Realtime::LSystemShapeDataGeneration() {
     clearShapeData(m_shapeData);
 
     // Define the axiom (tree starts with a trunk)
-    std::string axiom = "BFFFX";
+    std::string axiom = "BFFX";
+    std::unordered_map<char, std::string> rules;
 
-    std::unordered_map<char, std::string> rules = {
-        {'X', "X/-[-XL+XL+XL]+[+XL-XL-XL][&XL][^XL]\\"},
-        {'F', "F"},
-        {'L', "LX"}
+    if(settings.extraCredit4){
+    rules = {
+        {'X', "X[-&<XL][<++&XL]||X[--&>XL][+&XL]"},
     };
+    }else{
+    rules = {
+        {'X', "X[-&<X][<++&X]||X[--&>X][+&X]"},
+    };
+    }
 
     // Set the number of iterations (use fixed value for testing or user parameters)
     int iterations = settings.shapeParameter1; // Number of iterations to generate the tree structure
@@ -367,6 +377,9 @@ void Realtime::settingsChanged() {
         LSystemShapeDataGeneration();
     }
 
+    if(settings.extraCredit4 != previousSettings.extraCredit4){
+        LSystemShapeDataGeneration();
+    }
     // Update the stored previous settings
     previousSettings = settings;
 
@@ -424,24 +437,24 @@ void Realtime::mouseMoveEvent(QMouseEvent *event) {
             center = eye + lookDir; // Update the target point
         }
 
-        // // Vertical rotation (rotate around the camera's right vector)
-        // if (deltaY != 0) {
-        //     float angle = -deltaY * sensitivity; // Reverse the sign for intuitive up/down rotation
-        //     glm::vec3 right = glm::normalize(glm::cross(center - eye, up)); // Calculate the right vector of the camera
+        // Vertical rotation (rotate around the camera's right vector)
+        if (deltaY != 0) {
+            float angle = -deltaY * sensitivity; // Reverse the sign for intuitive up/down rotation
+            glm::vec3 right = glm::normalize(glm::cross(center - eye, up)); // Calculate the right vector of the camera
 
-        //     // Create a rotation matrix around the right vector and apply it
-        //     glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), angle, right);
-        //     glm::vec3 lookDir = glm::normalize(center - eye); // Current look direction
-        //     glm::vec3 newLookDir = glm::mat3(rotationMatrix) * lookDir; // New look direction
+            // Create a rotation matrix around the right vector and apply it
+            glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), angle, right);
+            glm::vec3 lookDir = glm::normalize(center - eye); // Current look direction
+            glm::vec3 newLookDir = glm::mat3(rotationMatrix) * lookDir; // New look direction
 
-        //     // Prevent flipping by clamping the vertical rotation
-        //     if (glm::dot(newLookDir, up) > 0.99f || glm::dot(newLookDir, up) < -0.99f) {
-        //         // Ignore rotation to prevent flipping if the look direction gets too vertical
-        //     } else {
-        //         center = eye + newLookDir; // Update the target point
-        //         up = glm::normalize(glm::cross(right, newLookDir)); // Update the up vector
-        //     }
-        // }
+            // Prevent flipping by clamping the vertical rotation
+            if (glm::dot(newLookDir, up) > 0.99f || glm::dot(newLookDir, up) < -0.99f) {
+                // Ignore rotation to prevent flipping if the look direction gets too vertical
+            } else {
+                center = eye + newLookDir; // Update the target point
+                up = glm::normalize(glm::cross(right, newLookDir)); // Update the up vector
+            }
+        }
 
         // Update the view matrix using the new eye, center, and up vectors
         m_view = glm::lookAt(eye, center, up);

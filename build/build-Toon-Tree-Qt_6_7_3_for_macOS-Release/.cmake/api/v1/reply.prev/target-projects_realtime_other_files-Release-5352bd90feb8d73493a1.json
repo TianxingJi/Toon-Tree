@@ -115,6 +115,18 @@
 				"file" : 0,
 				"line" : 2066,
 				"parent" : 15
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 2275,
+				"parent" : 2
+			},
+			{
+				"command" : 4,
+				"file" : 0,
+				"line" : 2066,
+				"parent" : 17
 			}
 		]
 	},
@@ -132,10 +144,10 @@
 			"sourceIndexes" : 
 			[
 				0,
-				3,
 				4,
 				5,
-				6
+				6,
+				7
 			]
 		},
 		{
@@ -143,7 +155,8 @@
 			"sourceIndexes" : 
 			[
 				1,
-				2
+				2,
+				3
 			]
 		}
 	],
@@ -157,31 +170,36 @@
 		},
 		{
 			"backtrace" : 6,
-			"path" : "resources/images/treeTrunk.jpg",
+			"path" : "resources/images/ground.jpeg",
 			"sourceGroupIndex" : 1
 		},
 		{
 			"backtrace" : 8,
-			"path" : "resources/images/treeLeaf.png",
+			"path" : "resources/images/treeTrunk.jpg",
 			"sourceGroupIndex" : 1
 		},
 		{
 			"backtrace" : 10,
+			"path" : "resources/images/treeLeaf.png",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 12,
 			"path" : "resources/shaders/phong.frag",
 			"sourceGroupIndex" : 0
 		},
 		{
-			"backtrace" : 12,
+			"backtrace" : 14,
 			"path" : "resources/shaders/phong.vert",
 			"sourceGroupIndex" : 0
 		},
 		{
-			"backtrace" : 14,
+			"backtrace" : 16,
 			"path" : "resources/shaders/texture.frag",
 			"sourceGroupIndex" : 0
 		},
 		{
-			"backtrace" : 16,
+			"backtrace" : 18,
 			"path" : "resources/shaders/texture.vert",
 			"sourceGroupIndex" : 0
 		}

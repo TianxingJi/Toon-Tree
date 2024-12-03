@@ -33,7 +33,6 @@ void Realtime::finish() {
     killTimer(m_timer);
     this->makeCurrent();
 
-    // Students: anything requiring OpenGL calls when the program exits should be done here
     // Delete VBO and VAO and Shader
     glDeleteBuffers(1, &m_vbo);
     glDeleteVertexArrays(1, &m_vao);
@@ -85,8 +84,6 @@ void Realtime::initializeGL() { // TODO: m_Data should be finished
     // Tells OpenGL how big the screen is
     glViewport(0, 0, m_width, m_height);
 
-    // Students: anything requiring OpenGL calls when the program starts should be done here
-
     // Set the clear color here
     glClearColor(0, 0, 0, 1);
 
@@ -97,31 +94,25 @@ void Realtime::initializeGL() { // TODO: m_Data should be finished
     // generateShapeData();
     initializeLights();
 
-    // load texture
+    // load texture for all the textures
     loadTexture(":/resources/images/treeTrunk.jpg", m_trunk_texture);
     loadTexture(":/resources/images/treeTrunk.jpg", m_branch_texture);
     loadTexture(":/resources/images/treeLeaf.png", m_leaf_texture);
     loadTexture(":/resources/images/ground.jpeg", m_ground_texture);
 
     // Set up for the frame buffer object
-    // Task 10: Set the texture.frag uniform for our texture
     glUseProgram(m_texture_shader);
-
     GLint textureLocation = glGetUniformLocation(m_texture_shader, "Texture");
-
     glUniform1i(textureLocation, 0);
-
     glUseProgram(0);
 
     // Set the phong.frag uniform for our texture
     glUseProgram(m_shader);
-
     GLint textureMapLocation = glGetUniformLocation(m_shader, "Texture");
-
     glUniform1i(textureMapLocation, 1);
-
     glUseProgram(0);
 
+    // Set up the full screen fbo vbo and vao
     std::vector<GLfloat> fullscreen_quad_data =
         { // POSITIONS       // UV COORDINATES
             -1.0f,  1.0f, 0.0f,   0.0f, 1.0f,  // Upper Left
@@ -152,11 +143,12 @@ void Realtime::initializeGL() { // TODO: m_Data should be finished
 
     makeFBO();
 
-    // L System Logic Below
+    // L System Logic Below to generate the relative view matrix and project matrix
     m_view = glm::lookAt(eye, center, up);
     m_proj = glm::perspective(glm::radians(30.0f), static_cast<float>(m_width) / m_height, settings.nearPlane, settings.farPlane);
 }
 
+// This is the method to load the texture image for texture mapping
 void Realtime::loadTexture(const std::string& filepath, GLuint& texture){
     // Prepare filepath
     QString qfilepath = QString::fromStdString(filepath);
@@ -218,7 +210,6 @@ void Realtime::makeFBO(){
 }
 
 void Realtime::paintGL() {
-
     // Task 24: Bind our FBO
     glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 
@@ -244,20 +235,20 @@ void Realtime::paintGL() {
     paintFBOTexture(m_fbo_texture, settings.perPixelFilter, settings.kernelBasedFilter);
 }
 
-// Task 31: Update the paintTexture function signature
+// Update the paintTexture function signature
 void Realtime::paintFBOTexture(GLuint texture, bool enablePerPixelFilter, bool enableKernelFilter){
     glUseProgram(m_texture_shader);
-    // Task 32: Set your bool uniform on whether or not to filter the texture drawn
+    // Set your bool uniform on whether or not to filter the texture drawn
     glUniform1f(glGetUniformLocation(m_texture_shader, "enablePerPixelFilter"), enablePerPixelFilter);
     glUniform1i(glGetUniformLocation(m_texture_shader, "enableKernelFilter"), enableKernelFilter);
 
-    // Task: Calculate texelSize and pass it to the shader
+    // Calculate texelSize and pass it to the shader
     float texelWidth = 1.0f / static_cast<float>(m_fbo_width);
     float texelHeight = 1.0f / static_cast<float>(m_fbo_height);
     glUniform2f(glGetUniformLocation(m_texture_shader, "texelSize"), texelWidth, texelHeight);
 
     glBindVertexArray(m_fullscreen_vao);
-    // Task 10: Bind "texture" to slot 0
+    // Bind "texture" to slot 0
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture);
 
@@ -280,11 +271,7 @@ void Realtime::resizeGL(int w, int h) {
 
     makeFBO();
 
-    // // Tells OpenGL how big the screen is
-    // glViewport(0, 0, size().width() * m_devicePixelRatio, size().height() * m_devicePixelRatio);
-
-    // Students: anything requiring OpenGL calls when the program starts should be done here
-    // new perspective should be calculated here
+    // new projective matrix is calculated here
     m_proj = glm::perspective(glm::radians(30.0f), static_cast<float>(m_width) / m_height, settings.nearPlane, settings.farPlane);
 
     update();
@@ -303,6 +290,7 @@ void clearShapeData(std::vector<ShapeData>& shapeData) {
     shapeData.clear();
 }
 
+// No need for our L system
 void Realtime::sceneChanged() {
 
     if(SceneParser::parse(settings.sceneFilePath, metaData)){
@@ -322,6 +310,7 @@ void Realtime::sceneChanged() {
 
 }
 
+// This is the method for generating L System
 void Realtime::LSystemShapeDataGeneration() {
     clearShapeData(m_shapeData);
 
@@ -354,6 +343,7 @@ void Realtime::LSystemShapeDataGeneration() {
     interpretLSystem(lSystemString, angle, length);
 }
 
+// We call this method when we click on the 'L System Generation' Button
 void Realtime::lSystemGeneration() {
     LSystemShapeDataGeneration();
     update(); // Request redraw
@@ -377,6 +367,7 @@ void Realtime::settingsChanged() {
         LSystemShapeDataGeneration();
     }
 
+    // Check if leaf is enabled
     if(settings.extraCredit4 != previousSettings.extraCredit4){
         LSystemShapeDataGeneration();
     }
@@ -471,7 +462,7 @@ void Realtime::timerEvent(QTimerEvent *event) {
     m_elapsedTimer.restart();
 
     // Movement speed
-    float moveSpeed = 2.0f; // Adjust as needed for speed
+    float moveSpeed = 3.0f; // Adjust as needed for speed
 
     // Compute the camera directions
     glm::vec3 look = glm::normalize(center - eye); // Forward direction

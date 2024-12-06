@@ -48,13 +48,53 @@ void Realtime::initializeLights() {
     lights.push_back(directionalLight);
 }
 
-void Realtime::initializeBase() {
-    float radius = 4.0f; // Same radius as used for the forest distribution
-    float margin = 2.0f; // Add some margin around the circular forest area
-    float baseWidth = (radius * 2.0f) + margin; // For radius=4, diameter=8, plus margin=2, total=10
+void Realtime::updateLights() {
 
-    // Use the same width and depth
-    glm::vec3 baseSize = glm::vec3(baseWidth, 0.1f, baseWidth);
+    int hour = settings.shapeParameter4;
+
+    // Simulate color transitions throughout the day
+    glm::vec3 morningColor = glm::vec3(1.0f, 0.8f, 0.6f);  // Warm morning light
+    glm::vec3 noonColor = glm::vec3(1.0f, 1.0f, 0.9f);     // Bright midday light
+    glm::vec3 eveningColor = glm::vec3(1.0f, 0.5f, 0.4f);  // Warm sunset light
+    glm::vec3 nightColor = glm::vec3(0.2f, 0.2f, 0.5f);    // Cool nighttime light
+
+    glm::vec3 currentColor;
+    if (hour < 6) { // Dawn to early morning
+        currentColor = glm::mix(nightColor, morningColor, (hour - 1) / 5.0f);
+    } else if (hour < 12) { // Morning to midday
+        currentColor = glm::mix(morningColor, noonColor, (hour - 6) / 6.0f);
+    } else if (hour < 18) { // Midday to evening
+        currentColor = glm::mix(noonColor, eveningColor, (hour - 12) / 6.0f);
+    } else { // Evening to night
+        currentColor = glm::mix(eveningColor, nightColor, (hour - 18) / 5.0f);
+    }
+
+    // Simulate light direction transitions throughout the day
+    glm::vec3 morningDirection = glm::vec3(-1.0f, -1.0f, 0.0f); // Sunrise direction
+    glm::vec3 noonDirection = glm::vec3(0.0f, -1.0f, -1.0f);    // Midday direction
+    glm::vec3 eveningDirection = glm::vec3(1.0f, -1.0f, 0.0f);  // Sunset direction
+    glm::vec3 nightDirection = glm::vec3(-0.5f, -0.5f, -0.5f);  // Nighttime direction
+
+    glm::vec3 currentDirection;
+    if (hour < 12) { // Sunrise to midday
+        currentDirection = glm::mix(morningDirection, noonDirection, (hour - 1) / 11.0f);
+    } else { // Midday to sunset and night
+        currentDirection = glm::mix(noonDirection, nightDirection, (hour - 12) / 11.0f);
+    }
+
+    // Update the attributes of the first directional light
+    CustomLightData& directionalLight = lights[0];
+    directionalLight.color = glm::vec4(currentColor, 1.0f);        // Update color
+    directionalLight.direction = glm::vec4(currentDirection, 0.0f); // Update direction
+}
+
+void Realtime::initializeBase() {
+    float radius = 8.0f; // Expand the ground radius
+    float margin = 4.0f; // Add extra margin around the edges
+    float baseWidth = (radius * 2.0f) + margin; // New width is the diameter + margin, total = 20
+
+    // Set the new ground size (including width, depth, and thickness)
+    glm::vec3 baseSize = glm::vec3(baseWidth, 0.2f, baseWidth); // Thickness increased from 0.1f to 0.2f
     glm::vec3 basePosition = glm::vec3(0.0f, -0.5f - baseSize.y / 2.0f, 0.0f);
 
     std::vector<GLfloat> baseVertices;
@@ -362,6 +402,14 @@ void Realtime::paintLSystem() {
     // Pass view and projection matrices
     glUniformMatrix4fv(glGetUniformLocation(m_shader, "viewMatrix"), 1, GL_FALSE, &m_view[0][0]);
     glUniformMatrix4fv(glGetUniformLocation(m_shader, "projMatrix"), 1, GL_FALSE, &m_proj[0][0]);
+
+    // Pass light space matrix
+    glUniformMatrix4fv(glGetUniformLocation(m_shader, "lightSpaceMatrix"), 1, GL_FALSE, &lightSpaceMatrix[0][0]);
+
+    // Bind shadow texture
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, shadowTexture);
+    glUniform1i(glGetUniformLocation(m_shader, "shadowMap"), 2);
 
     // Pass camera position
     glUniform4fv(glGetUniformLocation(m_shader, "cameraPosition"), 1, &glm::vec4(eye, 1.0f)[0]);

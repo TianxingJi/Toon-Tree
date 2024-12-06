@@ -8,6 +8,7 @@ struct Settings {
     int shapeParameter1 = 1;
     int shapeParameter2 = 1;
     int shapeParameter3 = 1;
+    int shapeParameter4 = 1;
     float nearPlane = 1;
     float farPlane = 1;
     bool perPixelFilter = false;

@@ -1,7 +1,6 @@
 #include "realtime.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <iostream>
 #include <random>
 
 float randomFloat(float min, float max) {

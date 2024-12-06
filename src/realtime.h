@@ -146,12 +146,20 @@ private:
     void loadTexture(const std::string& filepath, GLuint& texture);
     std::vector<ShapeData> templateTree; // store a template tree
 
-    //For Particle Effects
+    // For Particle Effects
     GLuint m_particle_shader;
     GLuint m_particleVAO = 0;
     GLuint m_particleVBO = 0;
     std::vector<Particle> particles;
     int maxParticles = 1000; // Particle Number
+
+    // For Shadow
+    glm::mat4 lightSpaceMatrix;
+    GLuint shadowFBO;
+    GLuint shadowTexture;
+    GLuint m_depth_shader;
+    void makeShadowFBO();
+    void renderShadowMap();
 
     // Camera parameters
     glm::vec3 eye = glm::vec3(0.0f, 0.0f, 3.0f);  // Default camera position
@@ -159,6 +167,7 @@ private:
     glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);  // Up direction
 
     void initializeLights();
+    void updateLights();
     void paintLSystem();
 
     // Task 30: Update the paintTexture function signature

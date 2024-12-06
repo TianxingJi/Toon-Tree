@@ -21,6 +21,7 @@ struct Light {
 in vec3 worldSpacePosition;
 in vec3 worldSpaceNormal;
 in vec2 TexCoords; // Interpolated UV coordinates from vertex shader
+in vec4 fragPosLightSpace; // Light space position from vertex shader
 
 // Task 10: declare an out vec4 for your output color
 out vec4 fragColor;
@@ -34,6 +35,7 @@ uniform float ka;
 uniform float kd;
 uniform bool textureUsed; // Whether use texture map
 uniform sampler2D Texture; // Texture uniform
+uniform sampler2D shadowMap; // Add Shadow Map sampler
 uniform float blend;
 uniform float repeatU;
 uniform float repeatV;
@@ -45,6 +47,31 @@ uniform vec4 cameraPosition;
 
 uniform Light lights[8];   // Array of lights, up to eight lights
 uniform int numLights;     // Actual number of active lights
+
+// Function to calculate shadow
+float calculateShadow(vec4 fragPosLightSpace) {
+    // Perform perspective divide
+    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+    // Transform to [0, 1] range
+    projCoords = projCoords * 0.5 + 0.5;
+
+    // Get the depth from the shadow map
+    float closestDepth = texture(shadowMap, projCoords.xy).r;
+    // Get the current fragment's depth in light space
+    float currentDepth = projCoords.z;
+
+    // Bias to reduce shadow acne
+    float bias = 0.002;
+    // Check if the fragment is in shadow
+    float shadow = currentDepth - bias > closestDepth ? 0.8 : 0.0;
+
+    // If outside light projection, no shadow
+    if (projCoords.z > 1.0) {
+        shadow = 0.0;
+    }
+
+    return shadow;
+}
 
 void main() {
     // Ambient color
@@ -107,6 +134,9 @@ void main() {
 
          }
 
+         // Calculate shadow
+         float shadow = calculateShadow(fragPosLightSpace);
+
          // Diffuse lighting
          float diffuseFactor = max(dot(normal, lightDir), 0.0);
          vec4 blendedDiffuse =  kd * material.diffuse; // Set up for Texture Mapping
@@ -118,7 +148,6 @@ void main() {
          }
 
          vec4 diffuseColor = blendedDiffuse * diffuseFactor;
-         fragColor += attenuationFactor * lightData.color * diffuseColor;
 
          // Specular lighting
          vec3 reflectedDir = reflect(-lightDir, normal);
@@ -131,7 +160,7 @@ void main() {
          }
          vec4 specularColor = ks * material.specular * specularFactor;
 
-         fragColor += attenuationFactor * lightData.color * specularColor;
+         fragColor += attenuationFactor * lightData.color * (diffuseColor + specularColor) * (1.0 - shadow);
     }
 
 }

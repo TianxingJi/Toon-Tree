@@ -11,6 +11,7 @@ layout(location = 2) in vec2 uv;        // UV coordinates
 out vec3 worldSpacePosition;
 out vec3 worldSpaceNormal;
 out vec2 TexCoords; // Pass UV coordinates to fragment shader
+out vec4 fragPosLightSpace; // Add an output for the light space position
 
 // Task 6: declare a uniform mat4 to store model matrix
 uniform mat4 modelMatrix;
@@ -19,6 +20,9 @@ uniform mat3 normalMatrix;
 // Task 7: declare uniform mat4's for the view and projection matrix
 uniform mat4 viewMatrix;
 uniform mat4 projMatrix;
+
+// Add a uniform for the light space transformation matrix
+uniform mat4 lightSpaceMatrix;
 
 void main() {
     TexCoords = uv; // Pass UV to fragment shader
@@ -33,4 +37,7 @@ void main() {
 
     // Task 9: set gl_Position to the object space position transformed to clip space
     gl_Position = projMatrix * viewMatrix * modelMatrix * vec4(objectSpacePosition, 1.0);
+
+    // Transform to light space
+    fragPosLightSpace = lightSpaceMatrix * modelMatrix * vec4(objectSpacePosition, 1.0);
 }

@@ -47,11 +47,21 @@ void Realtime::finish() {
     glDeleteRenderbuffers(1, &m_fbo_renderbuffer);
     glDeleteFramebuffers(1, &m_fbo);
 
+    // For Shadow
+    glDeleteFramebuffers(1, &shadowFBO);
+    glDeleteTextures(1, &shadowTexture);
+    glDeleteProgram(m_depth_shader);
 
+    // For L System
     glDeleteTextures(1, &m_trunk_texture);
     glDeleteTextures(1, &m_branch_texture);
     glDeleteTextures(1, &m_leaf_texture);
     glDeleteTextures(1, &m_ground_texture);
+
+    // For Particle System
+    glDeleteProgram(m_particle_shader);
+    glDeleteVertexArrays(1, &m_particleVAO);
+    glDeleteBuffers(1, &m_particleVBO);
 
     this->doneCurrent();
 }
@@ -59,7 +69,7 @@ void Realtime::finish() {
 void Realtime::initializeGL() { // TODO: m_Data should be finished
     m_devicePixelRatio = this->devicePixelRatio();
 
-    m_defaultFBO = 2;
+    m_defaultFBO = 3;
     m_width = size().width() * m_devicePixelRatio;
     m_height = size().height() * m_devicePixelRatio;
     m_fbo_width = m_width;
@@ -92,9 +102,11 @@ void Realtime::initializeGL() { // TODO: m_Data should be finished
     m_shader = ShaderLoader::createShaderProgram(":/resources/shaders/phong.vert", ":/resources/shaders/phong.frag");
     m_texture_shader = ShaderLoader::createShaderProgram(":/resources/shaders/texture.vert", ":/resources/shaders/texture.frag");
     m_particle_shader = ShaderLoader::createShaderProgram(":/resources/shaders/particle.vert", ":/resources/shaders/particle.frag");
+    m_depth_shader = ShaderLoader::createShaderProgram(":/resources/shaders/depth.vert", ":/resources/shaders/depth.frag");
 
     // generateShapeData();
     initializeLights();
+    updateLights();
 
     // Particles Initialization
     initializeParticles();
@@ -115,6 +127,11 @@ void Realtime::initializeGL() { // TODO: m_Data should be finished
     glUseProgram(m_shader);
     GLint textureMapLocation = glGetUniformLocation(m_shader, "Texture");
     glUniform1i(textureMapLocation, 1);
+    glUseProgram(0);
+
+    glUseProgram(m_shader);
+    GLint shadowMapLocation = glGetUniformLocation(m_shader, "shadowMap");
+    glUniform1i(shadowMapLocation, 2);
     glUseProgram(0);
 
     // Set up the full screen fbo vbo and vao
@@ -147,6 +164,7 @@ void Realtime::initializeGL() { // TODO: m_Data should be finished
     glBindVertexArray(0);
 
     makeFBO();
+    makeShadowFBO();
 
     // L System Logic Below to generate the relative view matrix and project matrix
     m_view = glm::lookAt(eye, center, up);
@@ -167,8 +185,8 @@ void Realtime::loadTexture(const std::string& filepath, GLuint& texture){
     // Task 3: Generate kitten texture
     glGenTextures(1, &texture);
 
-    // Task 9: Set the active texture slot to texture slot 0
-    glActiveTexture(GL_TEXTURE0);
+    // Task 9: Set the active texture slot to texture slot 1
+    glActiveTexture(GL_TEXTURE1);
 
     // Task 4: Bind kitten texture
     glBindTexture(GL_TEXTURE_2D, texture);
@@ -214,34 +232,109 @@ void Realtime::makeFBO(){
     glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);
 }
 
+void Realtime::makeShadowFBO() {
+    // Create and bind the shadow texture
+    glGenTextures(1, &shadowTexture);
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, shadowTexture);
+
+    // Allocate space for depth texture
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, m_fbo_width, m_fbo_height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+
+    // Set texture parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+    // Unbind the texture for now
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    // Generate and bind the shadow framebuffer
+    glGenFramebuffers(1, &shadowFBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO);
+
+    // Attach the depth texture as the framebuffer's depth buffer
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, shadowTexture, 0);
+
+    // Ensure no color output is used in the shadow framebuffer
+    glDrawBuffer(GL_NONE);
+    glReadBuffer(GL_NONE);
+
+    // Check if the framebuffer is complete
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+        std::cerr << "Shadow FBO is not complete!" << std::endl;
+    }
+
+    // Unbind the framebuffer
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
 void Realtime::paintGL() {
-    // Task 24: Bind our FBO
-    glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
-
-    // Task 28: Call glViewport
+    // Step 1: Shadow Map Pass
+    glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO);
     glViewport(0, 0, m_fbo_width, m_fbo_height);
-    // glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
+    glClear(GL_DEPTH_BUFFER_BIT);
+    renderShadowMap();
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+    // Step 2: Regular Scene Rendering
+    glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+    glViewport(0, 0, m_fbo_width, m_fbo_height);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    // paintGeometry();
-    // Paint L-System geometry
     paintLSystem();
-
-    if(settings.extraCredit3){
+    if (settings.extraCredit3) {
         renderParticles();
     }
 
-    // Task 25: Bind the default framebuffer
     glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);
     glViewport(0, 0, m_width, m_height);
-    // glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
-
-    // Task 26: Clear the color and depth buffers
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    // Task 27: Call paintTexture to draw our FBO color attachment texture | Task 31: Set bool parameter to true
     paintFBOTexture(m_fbo_texture, settings.perPixelFilter, settings.kernelBasedFilter);
+}
+
+void Realtime::renderShadowMap(){
+    const CustomLightData& directionalLight = lights[0];
+
+    glUseProgram(m_depth_shader);
+
+    // Set the light's projection matrix (orthographic projection is suitable for directional light)
+    glm::mat4 lightProjection = glm::ortho(-20.0f, 20.0f, -20.0f, 20.0f, 1.0f, 50.0f);
+
+    // Set the light's view matrix
+    glm::vec3 sceneCenter = glm::vec3(0.0f, 0.0f, 0.0f); // Assume the scene center is at the origin
+    glm::vec3 lightDir = glm::normalize(glm::vec3(directionalLight.direction));
+    glm::vec3 lightPos = sceneCenter - lightDir * 20.0f; // Place the light at the opposite direction of the scene center
+    glm::mat4 lightView = glm::lookAt(
+        lightPos,                 // Light position
+        lightPos + lightDir,      // Light's target direction
+        glm::vec3(0.0f, 1.0f, 0.0f) // Up direction in world coordinates
+        );
+
+    // Compute the light-space matrix
+    lightSpaceMatrix = lightProjection * lightView;
+
+    // Pass the light-space matrix to the depth shader
+    glUniformMatrix4fv(glGetUniformLocation(m_depth_shader, "lightSpaceMatrix"), 1, GL_FALSE, &lightSpaceMatrix[0][0]);
+
+    // Begin rendering to the Shadow Map
+    glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO);
+    glViewport(0, 0, m_fbo_width, m_fbo_height);
+    glClear(GL_DEPTH_BUFFER_BIT);
+
+    // Render L-System geometry
+    for (const ShapeData& shape : m_shapeData) {
+        glBindVertexArray(shape.vao);
+
+        // Pass the model matrix to the depth shader
+        glUniformMatrix4fv(glGetUniformLocation(m_depth_shader, "modelMatrix"), 1, GL_FALSE, &shape.modelMatrix[0][0]);
+
+        glDrawArrays(GL_TRIANGLES, 0, shape.vertexCount);
+        glBindVertexArray(0);
+    }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glUseProgram(0);
 }
 
 // Update the paintTexture function signature
@@ -279,6 +372,11 @@ void Realtime::resizeGL(int w, int h) {
     m_fbo_height = m_height;
 
     makeFBO();
+
+    // Update Shadow FBO
+    glDeleteFramebuffers(1, &shadowFBO);
+    glDeleteTextures(1, &shadowTexture);
+    makeShadowFBO();
 
     // new projective matrix is calculated here
     m_proj = glm::perspective(glm::radians(30.0f), static_cast<float>(m_width) / m_height, settings.nearPlane, settings.farPlane);
@@ -374,6 +472,10 @@ void Realtime::settingsChanged() {
         settings.shapeParameter2 != previousSettings.shapeParameter2 ||
         settings.shapeParameter3 != previousSettings.shapeParameter3) {
         LSystemShapeDataGeneration();
+    }
+
+    if (settings.shapeParameter4 != previousSettings.shapeParameter4) {
+        updateLights();
     }
 
     // Check if leaf is enabled

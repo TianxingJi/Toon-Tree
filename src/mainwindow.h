@@ -27,7 +27,7 @@ private:
     void connectFar();
     void connectPerPixelFilter();
     void connectKernelBasedFilter();
-    void connectUploadFile();
+    // void connectUploadFile();
     void connectLSystemGenerate();
     void connectSaveImage();
     void connectExtraCredit();
@@ -36,7 +36,7 @@ private:
     AspectRatioWidget *aspectRatioWidget;
     QCheckBox *filter1;
     QCheckBox *filter2;
-    QPushButton *uploadFile;
+    // QPushButton *uploadFile;
     QPushButton *lSystem;
     QPushButton *saveImage;
     QSlider *p1Slider;
@@ -61,7 +61,7 @@ private:
 private slots:
     void onPerPixelFilter();
     void onKernelBasedFilter();
-    void onUploadFile();
+    // void onUploadFile();
     void onLSystem();
     void onSaveImage();
     void onValChangeP1(int newValue);

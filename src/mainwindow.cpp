@@ -61,9 +61,9 @@ void MainWindow::initialize() {
     filter2->setText(QStringLiteral("Kernel-Based Filter"));
     filter2->setChecked(false);
 
-    // Create file uploader for scene file
-    uploadFile = new QPushButton();
-    uploadFile->setText(QStringLiteral("Upload Scene File"));
+    // // Create file uploader for scene file
+    // uploadFile = new QPushButton();
+    // uploadFile->setText(QStringLiteral("Upload Scene File"));
 
     lSystem = new QPushButton();
     lSystem->setText(QStringLiteral("L System Generation"));
@@ -204,7 +204,7 @@ void MainWindow::initialize() {
     ec4->setText(QStringLiteral("Leaf"));
     ec4->setChecked(false);
 
-    vLayout->addWidget(uploadFile);
+    // vLayout->addWidget(uploadFile);
     vLayout->addWidget(lSystem);
     vLayout->addWidget(saveImage);
     vLayout->addWidget(tesselation_label);
@@ -252,7 +252,7 @@ void MainWindow::finish() {
 void MainWindow::connectUIElements() {
     connectPerPixelFilter();
     connectKernelBasedFilter();
-    connectUploadFile();
+   // connectUploadFile();
     connectLSystemGenerate();
     connectSaveImage();
     connectParam1();
@@ -272,9 +272,9 @@ void MainWindow::connectKernelBasedFilter() {
     connect(filter2, &QCheckBox::clicked, this, &MainWindow::onKernelBasedFilter);
 }
 
-void MainWindow::connectUploadFile() {
-    connect(uploadFile, &QPushButton::clicked, this, &MainWindow::onUploadFile);
-}
+// void MainWindow::connectUploadFile() {
+//     connect(uploadFile, &QPushButton::clicked, this, &MainWindow::onUploadFile);
+// }
 
 void MainWindow::connectLSystemGenerate() {
     connect(lSystem, &QPushButton::clicked, this, &MainWindow::onLSystem);
@@ -337,47 +337,39 @@ void MainWindow::onKernelBasedFilter() {
     realtime->settingsChanged();
 }
 
-void MainWindow::onUploadFile() {
-    // Get abs path of scene file
-    QString configFilePath = QFileDialog::getOpenFileName(this, tr("Upload File"),
-                                                          QDir::currentPath()
-                                                              .append(QDir::separator())
-                                                              .append("scenefiles")
-                                                              .append(QDir::separator())
-                                                              .append("action")
-                                                              .append(QDir::separator())
-                                                              .append("required"), tr("Scene Files (*.json)"));
-    if (configFilePath.isNull()) {
-        std::cout << "Failed to load null scenefile." << std::endl;
-        return;
-    }
+// void MainWindow::onUploadFile() {
+//     // Get abs path of scene file
+//     QString configFilePath = QFileDialog::getOpenFileName(this, tr("Upload File"),
+//                                                           QDir::currentPath()
+//                                                               .append(QDir::separator())
+//                                                               .append("scenefiles")
+//                                                               .append(QDir::separator())
+//                                                               .append("action")
+//                                                               .append(QDir::separator())
+//                                                               .append("required"), tr("Scene Files (*.json)"));
+//     if (configFilePath.isNull()) {
+//         std::cout << "Failed to load null scenefile." << std::endl;
+//         return;
+//     }
 
-    settings.sceneFilePath = configFilePath.toStdString();
+//     settings.sceneFilePath = configFilePath.toStdString();
 
-    std::cout << "Loaded scenefile: \"" << configFilePath.toStdString() << "\"." << std::endl;
+//     std::cout << "Loaded scenefile: \"" << configFilePath.toStdString() << "\"." << std::endl;
 
-    realtime->sceneChanged();
-}
+//     realtime->sceneChanged();
+// }
 
 void MainWindow::onLSystem() {
     realtime->lSystemGeneration();
 }
 
 void MainWindow::onSaveImage() {
-    if (settings.sceneFilePath.empty()) {
-        std::cout << "No scene file loaded." << std::endl;
-        return;
-    }
     std::string sceneName = settings.sceneFilePath.substr(0, settings.sceneFilePath.find_last_of("."));
     sceneName = sceneName.substr(sceneName.find_last_of("/")+1);
     QString filePath = QFileDialog::getSaveFileName(this, tr("Save Image"),
                                                     QDir::currentPath()
                                                         .append(QDir::separator())
-                                                        .append("student_outputs")
-                                                        .append(QDir::separator())
-                                                        .append("action")
-                                                        .append(QDir::separator())
-                                                        .append("required")
+                                                        .append("output")
                                                         .append(QDir::separator())
                                                         .append(sceneName), tr("Image Files (*.png)"));
     std::cout << "Saving image to: \"" << filePath.toStdString() << "\"." << std::endl;

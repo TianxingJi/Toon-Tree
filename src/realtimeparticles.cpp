@@ -1,6 +1,7 @@
 #include "realtime.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <iostream>
 #include <random>
 
 float randomFloat(float min, float max) {
@@ -20,7 +21,7 @@ void Realtime::initializeParticles() {
         // Randomly place particles within the range x,z in [-10,10] and y in [5,10]
         p.position = glm::vec3(
             randomFloat(-10.0f, 10.0f),
-            randomFloat(5.0f, 10.0f),
+            randomFloat(10.0f, 15.0f),
             randomFloat(-10.0f, 10.0f)
             );
 
@@ -76,7 +77,7 @@ void Realtime::updateParticles(float deltaTime) {
 
         // If the particle falls below the ground level, reset it
         if (p.position.y < groundLevel - 1.0f) {
-            p.position.y = resetY + randomFloat(0.0f, 5.0f);
+            p.position.y = resetY + randomFloat(5.0f, 10.0f);
             p.position.x = randomFloat(-10.0f, 10.0f);
             p.position.z = randomFloat(-10.0f, 10.0f);
 

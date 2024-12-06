@@ -397,25 +397,25 @@ void clearShapeData(std::vector<ShapeData>& shapeData) {
     shapeData.clear();
 }
 
-// No need for our L system
-void Realtime::sceneChanged() {
+// // No need for our L system
+// void Realtime::sceneChanged() {
 
-    if(SceneParser::parse(settings.sceneFilePath, metaData)){
-        sceneLoader.setSceneLoader(m_width, m_height, metaData);
+//     if(SceneParser::parse(settings.sceneFilePath, metaData)){
+//         sceneLoader.setSceneLoader(m_width, m_height, metaData);
 
-        // clean the shape Data that store all of the handled shape data
-        clearShapeData(m_shapeData);
-        // TODO data changed
-        // Regenerate shape data with the new scene configuration
-        generateShapeData();
+//         // clean the shape Data that store all of the handled shape data
+//         clearShapeData(m_shapeData);
+//         // TODO data changed
+//         // Regenerate shape data with the new scene configuration
+//         generateShapeData();
 
-        update(); // asks for a PaintGL() call to occur
-    } else {
-        // output file failed to read
-        std::cerr << "Failed to load scene file: " << settings.sceneFilePath << std::endl;
-    }
+//         update(); // asks for a PaintGL() call to occur
+//     } else {
+//         // output file failed to read
+//         std::cerr << "Failed to load scene file: " << settings.sceneFilePath << std::endl;
+//     }
 
-}
+// }
 
 // This is the method for generating L System
 void Realtime::LSystemShapeDataGeneration() {
@@ -632,8 +632,8 @@ void Realtime::saveViewportImage(std::string filePath) {
     // Make sure we have the right context and everything has been drawn
     makeCurrent();
 
-    int fixedWidth = 1024;
-    int fixedHeight = 768;
+    int fixedWidth = m_width;
+    int fixedHeight = m_height;
 
     // Create Frame Buffer
     GLuint fbo;

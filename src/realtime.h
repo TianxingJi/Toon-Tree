@@ -31,6 +31,14 @@ struct ShapeData {
     float repeatV;
 };
 
+struct Particle {
+    glm::vec3 position;   // Particle Position
+    glm::vec3 velocity;   // Particle Speed
+    float lifetime;       // Particle Lifespan
+    float size;           // Particle Size
+    float opacity;        // Particle Opacity
+};
+
 struct CustomLightData {
     int type;          // 0 = Point, 1 = Directional, 2 = Spot
     glm::vec4 color;   // Light color
@@ -68,6 +76,7 @@ public:
     glm::mat4 customRotate(const glm::vec3& axis, float radians);
     void LSystemShapeDataGeneration();
     void lSystemGeneration();
+    void initializeBase();
     void interpretLSystem(const std::string& lSystemString, float angle, float length);
     void generateShape(PrimitiveType type, std::vector<GLfloat> &vertices);
     glm::mat4 calculateModelMatrix(const glm::vec3 &start, const glm::vec3 &end, float thickness);
@@ -79,6 +88,7 @@ public:
         float shininess,
         const GLuint& texture,
         const glm::mat4& modelMatrix,
+        bool isBase,
         float blend = 1.0f,  // Default blend factor
         float repeatU = 1.0f, // Default U texture repeat
         float repeatV = 1.0f  // Default V texture repeat
@@ -102,10 +112,14 @@ private:
     void mouseMoveEvent(QMouseEvent *event) override;
     void timerEvent(QTimerEvent *event) override;
     void generateShapeData();
+    void initializeParticles();
+    void updateParticles(float deltaTime);
+    void renderParticles();
 
     // Tick Related Variables
     int m_timer;                                        // Stores timer which attempts to run ~60 times per second
     QElapsedTimer m_elapsedTimer;                       // Stores timer which keeps track of actual time between frames
+    float m_time;                                        // Keeps track of actual time
 
     // Input Related Variables
     bool m_mouseDown = false;                           // Stores state of left mouse button
@@ -130,6 +144,14 @@ private:
     GLuint m_leaf_texture;
     GLuint m_ground_texture;
     void loadTexture(const std::string& filepath, GLuint& texture);
+    std::vector<ShapeData> templateTree; // store a template tree
+
+    //For Particle Effects
+    GLuint m_particle_shader;
+    GLuint m_particleVAO = 0;
+    GLuint m_particleVBO = 0;
+    std::vector<Particle> particles;
+    int maxParticles = 1000; // Particle Number
 
     // Camera parameters
     glm::vec3 eye = glm::vec3(0.0f, 0.0f, 3.0f);  // Default camera position

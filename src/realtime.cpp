@@ -85,14 +85,19 @@ void Realtime::initializeGL() { // TODO: m_Data should be finished
     glViewport(0, 0, m_width, m_height);
 
     // Set the clear color here
-    glClearColor(0, 0, 0, 1);
+    // glClearColor(0, 0, 0, 1);
+    glClearColor(0.2f, 0.3f, 0.4f, 1.0f);
 
     // Shader Loader
     m_shader = ShaderLoader::createShaderProgram(":/resources/shaders/phong.vert", ":/resources/shaders/phong.frag");
     m_texture_shader = ShaderLoader::createShaderProgram(":/resources/shaders/texture.vert", ":/resources/shaders/texture.frag");
+    m_particle_shader = ShaderLoader::createShaderProgram(":/resources/shaders/particle.vert", ":/resources/shaders/particle.frag");
 
     // generateShapeData();
     initializeLights();
+
+    // Particles Initialization
+    initializeParticles();
 
     // load texture for all the textures
     loadTexture(":/resources/images/treeTrunk.jpg", m_trunk_texture);
@@ -223,6 +228,10 @@ void Realtime::paintGL() {
     // Paint L-System geometry
     paintLSystem();
 
+    if(settings.extraCredit3){
+        renderParticles();
+    }
+
     // Task 25: Bind the default framebuffer
     glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);
     glViewport(0, 0, m_width, m_height);
@@ -315,7 +324,7 @@ void Realtime::LSystemShapeDataGeneration() {
     clearShapeData(m_shapeData);
 
     // Define the axiom (tree starts with a trunk)
-    std::string axiom = "BFFX";
+    std::string axiom = "FFX";
     std::unordered_map<char, std::string> rules;
 
     if(settings.extraCredit4){
@@ -371,6 +380,11 @@ void Realtime::settingsChanged() {
     if(settings.extraCredit4 != previousSettings.extraCredit4){
         LSystemShapeDataGeneration();
     }
+
+    if(settings.extraCredit2 != previousSettings.extraCredit2){
+        LSystemShapeDataGeneration();
+    }
+
     // Update the stored previous settings
     previousSettings = settings;
 
@@ -459,6 +473,7 @@ void Realtime::timerEvent(QTimerEvent *event) {
     // Calculate delta time
     int elapsedms = m_elapsedTimer.elapsed();
     float deltaTime = elapsedms * 0.001f; // Convert to seconds
+    m_time += deltaTime;
     m_elapsedTimer.restart();
 
     // Movement speed
@@ -500,6 +515,11 @@ void Realtime::timerEvent(QTimerEvent *event) {
 
     // Update the view matrix
     m_view = glm::lookAt(eye, center, up);
+
+    // Update Particles
+    if(settings.extraCredit3){
+        updateParticles(deltaTime);
+    }
 
     // Trigger a redraw
     update(); // Ask for a PaintGL() call

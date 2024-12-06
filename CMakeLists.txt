@@ -51,6 +51,7 @@ add_executable(${PROJECT_NAME}
     src/lsystem/lsystem.h src/lsystem/lsystem.cpp
     src/realtimelsystem.cpp
     src/realtimegeometry.cpp
+    src/realtimeparticles.cpp
 )
 
 # GLM: this creates its library and allows you to `#include "glm/..."`
@@ -82,6 +83,8 @@ qt6_add_resources(${PROJECT_NAME} "Resources"
         resources/shaders/phong.vert
         resources/shaders/texture.frag
         resources/shaders/texture.vert
+        resources/shaders/particle.frag
+        resources/shaders/particle.vert
 )
 
 # GLEW: this provides support for Windows (including 64-bit)

@@ -173,11 +173,11 @@ void MainWindow::initialize() {
     ec1->setChecked(false);
 
     ec2 = new QCheckBox();
-    ec2->setText(QStringLiteral("Extra Credit 2"));
+    ec2->setText(QStringLiteral("Forest"));
     ec2->setChecked(false);
 
     ec3 = new QCheckBox();
-    ec3->setText(QStringLiteral("Extra Credit 3"));
+    ec3->setText(QStringLiteral("Snow"));
     ec3->setChecked(false);
 
     ec4 = new QCheckBox();

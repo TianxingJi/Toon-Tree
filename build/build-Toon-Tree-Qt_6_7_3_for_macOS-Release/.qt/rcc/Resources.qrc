@@ -7,6 +7,8 @@
     <file alias="resources/shaders/phong.vert">/Users/tevenji/Desktop/Brown CSCI 1230:2230/Toon-Tree/resources/shaders/phong.vert</file>
     <file alias="resources/shaders/texture.frag">/Users/tevenji/Desktop/Brown CSCI 1230:2230/Toon-Tree/resources/shaders/texture.frag</file>
     <file alias="resources/shaders/texture.vert">/Users/tevenji/Desktop/Brown CSCI 1230:2230/Toon-Tree/resources/shaders/texture.vert</file>
+    <file alias="resources/shaders/particle.frag">/Users/tevenji/Desktop/Brown CSCI 1230:2230/Toon-Tree/resources/shaders/particle.frag</file>
+    <file alias="resources/shaders/particle.vert">/Users/tevenji/Desktop/Brown CSCI 1230:2230/Toon-Tree/resources/shaders/particle.vert</file>
   </qresource>
 </RCC>
 

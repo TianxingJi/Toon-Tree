@@ -487,6 +487,11 @@ void Realtime::settingsChanged() {
         LSystemShapeDataGeneration();
     }
 
+    if(settings.extraCredit1 != previousSettings.extraCredit1){
+        // do nothing but just do want to call update() to paintGL again
+    }
+
+
     // Update the stored previous settings
     previousSettings = settings;
 

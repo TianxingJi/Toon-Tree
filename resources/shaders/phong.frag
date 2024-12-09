@@ -35,6 +35,7 @@ uniform float ka;
 uniform float kd;
 uniform bool textureUsed; // Whether use texture map
 uniform sampler2D Texture; // Texture uniform
+uniform bool shadowMapEnable; // Whether to start shadow map or not
 uniform sampler2D shadowMap; // Add Shadow Map sampler
 uniform float blend;
 uniform float repeatU;
@@ -160,7 +161,11 @@ void main() {
          }
          vec4 specularColor = ks * material.specular * specularFactor;
 
-         fragColor += attenuationFactor * lightData.color * (diffuseColor + specularColor) * (1.0 - shadow);
+         if(shadowMapEnable){
+             fragColor += attenuationFactor * lightData.color * (diffuseColor + specularColor) * (1.0 - shadow);
+         } else {
+             fragColor += attenuationFactor * lightData.color * (diffuseColor + specularColor);
+         }
     }
 
 }

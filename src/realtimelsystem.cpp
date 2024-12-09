@@ -406,10 +406,12 @@ void Realtime::paintLSystem() {
     // Pass light space matrix
     glUniformMatrix4fv(glGetUniformLocation(m_shader, "lightSpaceMatrix"), 1, GL_FALSE, &lightSpaceMatrix[0][0]);
 
-    // Bind shadow texture
+    // Bind shadow texture and wether the shadow map is enabled
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D, shadowTexture);
     glUniform1i(glGetUniformLocation(m_shader, "shadowMap"), 2);
+
+    glUniform1i(glGetUniformLocation(m_shader, "shadowMapEnable"), settings.extraCredit1);
 
     // Pass camera position
     glUniform4fv(glGetUniformLocation(m_shader, "cameraPosition"), 1, &glm::vec4(eye, 1.0f)[0]);

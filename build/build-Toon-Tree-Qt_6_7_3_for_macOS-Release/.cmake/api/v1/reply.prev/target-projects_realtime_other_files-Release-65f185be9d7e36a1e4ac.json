@@ -151,6 +151,30 @@
 				"file" : 0,
 				"line" : 2066,
 				"parent" : 21
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 2275,
+				"parent" : 2
+			},
+			{
+				"command" : 4,
+				"file" : 0,
+				"line" : 2066,
+				"parent" : 23
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 2275,
+				"parent" : 2
+			},
+			{
+				"command" : 4,
+				"file" : 0,
+				"line" : 2066,
+				"parent" : 25
 			}
 		]
 	},
@@ -173,7 +197,9 @@
 				6,
 				7,
 				8,
-				9
+				9,
+				10,
+				11
 			]
 		},
 		{
@@ -237,6 +263,16 @@
 		{
 			"backtrace" : 22,
 			"path" : "resources/shaders/particle.vert",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 24,
+			"path" : "resources/shaders/depth.frag",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 26,
+			"path" : "resources/shaders/depth.vert",
 			"sourceGroupIndex" : 0
 		}
 	],

@@ -189,7 +189,7 @@ void MainWindow::initialize() {
 
     // Extra Credit:
     ec1 = new QCheckBox();
-    ec1->setText(QStringLiteral("Extra Credit 1"));
+    ec1->setText(QStringLiteral("Shadow Map"));
     ec1->setChecked(false);
 
     ec2 = new QCheckBox();

@@ -25,6 +25,7 @@ private:
     void connectParam4();
     void connectNear();
     void connectFar();
+    void connectToonSlider();
     void connectPerPixelFilter();
     void connectKernelBasedFilter();
     // void connectUploadFile();
@@ -37,7 +38,7 @@ private:
     QCheckBox *filter1;
     QCheckBox *filter2;
     // QPushButton *uploadFile;
-    QPushButton *lSystem;
+    // QPushButton *lSystem;
     QPushButton *saveImage;
     QSlider *p1Slider;
     QSlider *p2Slider;
@@ -51,6 +52,10 @@ private:
     QSlider *farSlider;
     QDoubleSpinBox *nearBox;
     QDoubleSpinBox *farBox;
+
+    QSlider *t1Slider;
+    QSpinBox *t1Box;
+    QCheckBox *tBool;
 
     // Extra Credit:
     QCheckBox *ec1;
@@ -72,6 +77,8 @@ private slots:
     void onValChangeFarSlider(int newValue);
     void onValChangeNearBox(double newValue);
     void onValChangeFarBox(double newValue);
+    void onValChangeT1(int newValue);
+    void onToonEnable();
 
     // Extra Credit:
     void onExtraCredit1();

@@ -179,7 +179,7 @@ void Realtime::interpretLSystem(const std::string& lSystemString, float angle, f
             glm::vec3 newPosition = turtle.position + turtle.growDirection * (length * 0.5f);
 
             std::vector<GLfloat> leafVertices;
-            generateShape(PrimitiveType::PRIMITIVE_CUBE, leafVertices); // Use cone as leaf
+            generateShape(PrimitiveType::PRIMITIVE_SPHERE, leafVertices); // Use cone as leaf
 
             float thickness = 0.05f - 0.001f * turtle.position.y;
             thickness = glm::max(thickness, 0.005f);
@@ -411,6 +411,8 @@ void Realtime::paintLSystem() {
     glBindTexture(GL_TEXTURE_2D, shadowTexture);
     glUniform1i(glGetUniformLocation(m_shader, "shadowMap"), 2);
 
+    glUniform1i(glGetUniformLocation(m_shader, "toonColorLevel"), settings.toonLevel);
+    glUniform1i(glGetUniformLocation(m_shader, "toonShadingEnable"), settings.toonEnable);
     glUniform1i(glGetUniformLocation(m_shader, "shadowMapEnable"), settings.extraCredit1);
 
     // Pass camera position

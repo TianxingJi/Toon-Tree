@@ -7,82 +7,66 @@
 #include <QSettings>
 #include <QLabel>
 #include <QGroupBox>
+#include <QtWidgets/qscrollarea.h>
 #include <iostream>
 
 void MainWindow::initialize() {
     realtime = new Realtime;
     aspectRatioWidget = new AspectRatioWidget(this);
     aspectRatioWidget->setAspectWidget(realtime, 3.f/4.f);
-    QHBoxLayout *hLayout = new QHBoxLayout; // horizontal alignment
-    QVBoxLayout *vLayout = new QVBoxLayout(); // vertical alignment
-    vLayout->setAlignment(Qt::AlignTop);
-    hLayout->addLayout(vLayout);
-    hLayout->addWidget(aspectRatioWidget, 1);
-    this->setLayout(hLayout);
 
-    // Create labels in sidebox
+    QHBoxLayout *mainLayout = new QHBoxLayout;
+
+    QScrollArea *scrollArea = new QScrollArea(this);
+    scrollArea->setWidgetResizable(true);
+
+    scrollArea->setFixedWidth(200);
+
+    QWidget *scrollContent = new QWidget(scrollArea);
+    QVBoxLayout *vLayout = new QVBoxLayout(scrollContent);
+    scrollContent->setLayout(vLayout);
+    scrollArea->setWidget(scrollContent);
+
     QFont font;
     font.setPointSize(12);
     font.setBold(true);
-    QLabel *tesselation_label = new QLabel(); // Parameters label
-    tesselation_label->setText("L System");
+
+    QLabel *tesselation_label = new QLabel("L System");
     tesselation_label->setFont(font);
-    QLabel *camera_label = new QLabel(); // Camera label
-    camera_label->setText("Camera");
+    QLabel *camera_label = new QLabel("Camera");
     camera_label->setFont(font);
-    QLabel *filters_label = new QLabel(); // Filters label
-    filters_label->setText("Filters");
+    QLabel *toon_label = new QLabel("Toon Shading");
+    toon_label->setFont(font);
+    QLabel *filters_label = new QLabel("Filters");
     filters_label->setFont(font);
-    QLabel *ec_label = new QLabel(); // Extra Credit label
-    ec_label->setText("Extra Credit");
+    QLabel *ec_label = new QLabel("Extra Credit");
     ec_label->setFont(font);
-    QLabel *param1_label = new QLabel(); // Parameter 1 label
-    param1_label->setText("Iteration:");
-    QLabel *param2_label = new QLabel(); // Parameter 2 label
-    param2_label->setText("Length");
-    QLabel *param3_label = new QLabel(); // Parameter 3 label
-    param3_label->setText("Angle");
-    QLabel *param4_label = new QLabel(); // Parameter 4 label
-    param4_label->setText("Day Time");
-    QLabel *near_label = new QLabel(); // Near plane label
-    near_label->setText("Near Plane:");
-    QLabel *far_label = new QLabel(); // Far plane label
-    far_label->setText("Far Plane:");
 
+    QLabel *param1_label = new QLabel("Iteration:");
+    QLabel *param2_label = new QLabel("Length");
+    QLabel *param3_label = new QLabel("Angle");
+    QLabel *param4_label = new QLabel("Day Time");
+    QLabel *near_label = new QLabel("Near Plane:");
+    QLabel *far_label = new QLabel("Far Plane:");
 
-
-    // Create checkbox for per-pixel filter
-    filter1 = new QCheckBox();
-    filter1->setText(QStringLiteral("Per-Pixel Filter"));
+    filter1 = new QCheckBox("Per-Pixel Filter");
     filter1->setChecked(false);
 
-    // Create checkbox for kernel-based filter
-    filter2 = new QCheckBox();
-    filter2->setText(QStringLiteral("Kernel-Based Filter"));
+    filter2 = new QCheckBox("Kernel-Based Filter");
     filter2->setChecked(false);
 
-    // // Create file uploader for scene file
-    // uploadFile = new QPushButton();
-    // uploadFile->setText(QStringLiteral("Upload Scene File"));
+    saveImage = new QPushButton("Save image");
 
-    lSystem = new QPushButton();
-    lSystem->setText(QStringLiteral("L System Generation"));
-    
-    saveImage = new QPushButton();
-    saveImage->setText(QStringLiteral("Save image"));
-
-    // Creates the boxes containing the parameter sliders and number boxes
-    QGroupBox *p1Layout = new QGroupBox(); // horizonal slider 1 alignment
+    QGroupBox *p1Layout = new QGroupBox();
     QHBoxLayout *l1 = new QHBoxLayout();
-    QGroupBox *p2Layout = new QGroupBox(); // horizonal slider 2 alignment
+    QGroupBox *p2Layout = new QGroupBox();
     QHBoxLayout *l2 = new QHBoxLayout();
-    QGroupBox *p3Layout = new QGroupBox(); // horizonal slider 3 alignment
+    QGroupBox *p3Layout = new QGroupBox();
     QHBoxLayout *l3 = new QHBoxLayout();
-    QGroupBox *p4Layout = new QGroupBox(); // horizonal slider 4 alignment
+    QGroupBox *p4Layout = new QGroupBox();
     QHBoxLayout *l4 = new QHBoxLayout();
 
-    // Create slider controls to control parameters
-    p1Slider = new QSlider(Qt::Orientation::Horizontal); // Parameter 1 slider
+    p1Slider = new QSlider(Qt::Orientation::Horizontal);
     p1Slider->setTickInterval(1);
     p1Slider->setMinimum(1);
     p1Slider->setMaximum(5);
@@ -94,7 +78,7 @@ void MainWindow::initialize() {
     p1Box->setSingleStep(1);
     p1Box->setValue(1);
 
-    p2Slider = new QSlider(Qt::Orientation::Horizontal); // Parameter 2 slider
+    p2Slider = new QSlider(Qt::Orientation::Horizontal);
     p2Slider->setTickInterval(1);
     p2Slider->setMinimum(1);
     p2Slider->setMaximum(25);
@@ -106,7 +90,7 @@ void MainWindow::initialize() {
     p2Box->setSingleStep(1);
     p2Box->setValue(1);
 
-    p3Slider = new QSlider(Qt::Orientation::Horizontal); // Parameter 3 slider
+    p3Slider = new QSlider(Qt::Orientation::Horizontal);
     p3Slider->setTickInterval(1);
     p3Slider->setMinimum(1);
     p3Slider->setMaximum(10);
@@ -118,7 +102,7 @@ void MainWindow::initialize() {
     p3Box->setSingleStep(1);
     p3Box->setValue(1);
 
-    p4Slider = new QSlider(Qt::Orientation::Horizontal); // Parameter 4 slider
+    p4Slider = new QSlider(Qt::Orientation::Horizontal);
     p4Slider->setTickInterval(1);
     p4Slider->setMinimum(1);
     p4Slider->setMaximum(23);
@@ -130,7 +114,6 @@ void MainWindow::initialize() {
     p4Box->setSingleStep(1);
     p4Box->setValue(0);
 
-    // Adds the slider and number box to the parameter layouts
     l1->addWidget(p1Slider);
     l1->addWidget(p1Box);
     p1Layout->setLayout(l1);
@@ -147,14 +130,12 @@ void MainWindow::initialize() {
     l4->addWidget(p4Box);
     p4Layout->setLayout(l4);
 
-    // Creates the boxes containing the camera sliders and number boxes
-    QGroupBox *nearLayout = new QGroupBox(); // horizonal near slider alignment
+    QGroupBox *nearLayout = new QGroupBox();
     QHBoxLayout *lnear = new QHBoxLayout();
-    QGroupBox *farLayout = new QGroupBox(); // horizonal far slider alignment
+    QGroupBox *farLayout = new QGroupBox();
     QHBoxLayout *lfar = new QHBoxLayout();
 
-    // Create slider controls to control near/far planes
-    nearSlider = new QSlider(Qt::Orientation::Horizontal); // Near plane slider
+    nearSlider = new QSlider(Qt::Orientation::Horizontal);
     nearSlider->setTickInterval(1);
     nearSlider->setMinimum(1);
     nearSlider->setMaximum(1000);
@@ -166,7 +147,7 @@ void MainWindow::initialize() {
     nearBox->setSingleStep(0.1f);
     nearBox->setValue(0.1f);
 
-    farSlider = new QSlider(Qt::Orientation::Horizontal); // Far plane slider
+    farSlider = new QSlider(Qt::Orientation::Horizontal);
     farSlider->setTickInterval(1);
     farSlider->setMinimum(1000);
     farSlider->setMaximum(10000);
@@ -178,7 +159,6 @@ void MainWindow::initialize() {
     farBox->setSingleStep(0.1f);
     farBox->setValue(100.f);
 
-    // Adds the slider and number box to the parameter layouts
     lnear->addWidget(nearSlider);
     lnear->addWidget(nearBox);
     nearLayout->setLayout(lnear);
@@ -187,25 +167,40 @@ void MainWindow::initialize() {
     lfar->addWidget(farBox);
     farLayout->setLayout(lfar);
 
-    // Extra Credit:
-    ec1 = new QCheckBox();
-    ec1->setText(QStringLiteral("Shadow Map"));
+    QGroupBox *t1Layout = new QGroupBox();
+    QHBoxLayout *t1 = new QHBoxLayout();
+
+    t1Slider = new QSlider(Qt::Orientation::Horizontal);
+    t1Slider->setTickInterval(1);
+    t1Slider->setMinimum(1);
+    t1Slider->setMaximum(10);
+    t1Slider->setValue(1);
+
+    t1Box = new QSpinBox();
+    t1Box->setMinimum(1);
+    t1Box->setMaximum(10);
+    t1Box->setSingleStep(1);
+    t1Box->setValue(1);
+
+    t1->addWidget(t1Slider);
+    t1->addWidget(t1Box);
+    t1Layout->setLayout(t1);
+    tBool = new QCheckBox("Enable Toon Shading");
+    tBool->setChecked(false);
+
+    // Extra Credit
+    ec1 = new QCheckBox("Shadow Map");
     ec1->setChecked(false);
 
-    ec2 = new QCheckBox();
-    ec2->setText(QStringLiteral("Forest"));
+    ec2 = new QCheckBox("Forest");
     ec2->setChecked(false);
 
-    ec3 = new QCheckBox();
-    ec3->setText(QStringLiteral("Snow"));
+    ec3 = new QCheckBox("Snow");
     ec3->setChecked(false);
 
-    ec4 = new QCheckBox();
-    ec4->setText(QStringLiteral("Leaf"));
+    ec4 = new QCheckBox("Leaf");
     ec4->setChecked(false);
 
-    // vLayout->addWidget(uploadFile);
-    vLayout->addWidget(lSystem);
     vLayout->addWidget(saveImage);
     vLayout->addWidget(tesselation_label);
     vLayout->addWidget(param1_label);
@@ -224,25 +219,37 @@ void MainWindow::initialize() {
     vLayout->addWidget(filters_label);
     vLayout->addWidget(filter1);
     vLayout->addWidget(filter2);
-    // Extra Credit:
+    vLayout->addWidget(toon_label);
+    vLayout->addWidget(tBool);
+    vLayout->addWidget(t1Layout);
     vLayout->addWidget(ec_label);
     vLayout->addWidget(ec1);
     vLayout->addWidget(ec2);
     vLayout->addWidget(ec3);
     vLayout->addWidget(ec4);
 
+    mainLayout->addWidget(scrollArea, 1);
+    mainLayout->addWidget(aspectRatioWidget, 3);
+
+    this->setLayout(mainLayout);
+
     connectUIElements();
 
-    // Set default values of 5 for tesselation parameters
+    // set default values of 5 for tesselation parameters
     onValChangeP1(1);
     onValChangeP2(1);
     onValChangeP3(1);
     onValChangeP4(1);
 
+    onValChangeT1(0);
+
     // Set default values for near and far planes
     onValChangeNearBox(0.1f);
     onValChangeFarBox(100.f);
+
+
 }
+
 
 void MainWindow::finish() {
     realtime->finish();
@@ -253,7 +260,7 @@ void MainWindow::connectUIElements() {
     connectPerPixelFilter();
     connectKernelBasedFilter();
    // connectUploadFile();
-    connectLSystemGenerate();
+    // connectLSystemGenerate();
     connectSaveImage();
     connectParam1();
     connectParam2();
@@ -261,6 +268,8 @@ void MainWindow::connectUIElements() {
     connectParam4();
     connectNear();
     connectFar();
+    connect(tBool, &QCheckBox::clicked, this, &MainWindow::onToonEnable);
+    connectToonSlider();
     connectExtraCredit();
 }
 
@@ -270,14 +279,6 @@ void MainWindow::connectPerPixelFilter() {
 
 void MainWindow::connectKernelBasedFilter() {
     connect(filter2, &QCheckBox::clicked, this, &MainWindow::onKernelBasedFilter);
-}
-
-// void MainWindow::connectUploadFile() {
-//     connect(uploadFile, &QPushButton::clicked, this, &MainWindow::onUploadFile);
-// }
-
-void MainWindow::connectLSystemGenerate() {
-    connect(lSystem, &QPushButton::clicked, this, &MainWindow::onLSystem);
 }
 
 void MainWindow::connectSaveImage() {
@@ -318,6 +319,12 @@ void MainWindow::connectFar() {
     connect(farSlider, &QSlider::valueChanged, this, &MainWindow::onValChangeFarSlider);
     connect(farBox, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
             this, &MainWindow::onValChangeFarBox);
+}
+
+void MainWindow::connectToonSlider() {
+    connect(t1Slider, &QSlider::valueChanged, this, &MainWindow::onValChangeT1);
+    connect(t1Box, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+            this, &MainWindow::onValChangeT1);
 }
 
 void MainWindow::connectExtraCredit() {
@@ -429,6 +436,18 @@ void MainWindow::onValChangeFarBox(double newValue) {
     farSlider->setValue(int(newValue*100.f));
     //farBox->setValue(newValue);
     settings.farPlane = farBox->value();
+    realtime->settingsChanged();
+}
+
+void MainWindow::onToonEnable() {
+    settings.toonEnable = !settings.toonEnable;
+    realtime->settingsChanged();
+}
+
+void MainWindow::onValChangeT1(int newValue) {
+    t1Slider->setValue(newValue);
+    t1Box->setValue(newValue);
+    settings.toonLevel = t1Slider->value();
     realtime->settingsChanged();
 }
 

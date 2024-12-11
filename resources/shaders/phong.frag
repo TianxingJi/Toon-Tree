@@ -33,6 +33,9 @@ uniform float ka;
 
 // Task 13: declare relevant uniform(s) here, for diffuse lighting
 uniform float kd;
+uniform bool toonShadingEnable;
+uniform int toonColorLevel; // level of toonShading
+float toonScaleFactor = 1.f / (11 - toonColorLevel);
 uniform bool textureUsed; // Whether use texture map
 uniform sampler2D Texture; // Texture uniform
 uniform bool shadowMapEnable; // Whether to start shadow map or not
@@ -45,6 +48,9 @@ uniform vec4 lightPosition;
 // Task 14: declare relevant uniform(s) here, for specular lighting
 uniform float ks;
 uniform vec4 cameraPosition;
+
+bool rimLightEnable = false;
+int rimLightPower = 4;
 
 uniform Light lights[8];   // Array of lights, up to eight lights
 uniform int numLights;     // Actual number of active lights
@@ -132,7 +138,6 @@ void main() {
              float t = (currentAngle - thetaInner) / (thetaOuter - thetaInner);
              attenuationFactor *= (1.0 - (3.0 * t * t - 2.0 * t * t * t)); // Smoothstep
              }
-
          }
 
          // Calculate shadow
@@ -141,6 +146,8 @@ void main() {
          // Diffuse lighting
          float diffuseFactor = max(dot(normal, lightDir), 0.0);
          vec4 blendedDiffuse =  kd * material.diffuse; // Set up for Texture Mapping
+
+         if (toonShadingEnable && diffuseFactor > 0) diffuseFactor = ceil(diffuseFactor * (11 - toonColorLevel)) * toonScaleFactor;
 
          if (textureUsed) { // if there is need to do texture map
              vec2 repeatedTexCoords = vec2(TexCoords.x * repeatU, TexCoords.y * repeatV);
@@ -159,7 +166,8 @@ void main() {
          } else {
              specularFactor = 1.0; // Handle shininess = 0 case
          }
-         vec4 specularColor = ks * material.specular * specularFactor;
+         vec4 specularColor = vec4(0.f, 0.f, 0.f, 1.f);
+         if (!toonShadingEnable) specularColor = ks * material.specular * specularFactor;
 
          if(shadowMapEnable){
              fragColor += attenuationFactor * lightData.color * (diffuseColor + specularColor) * (1.0 - shadow);

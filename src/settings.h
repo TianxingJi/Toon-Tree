@@ -11,6 +11,8 @@ struct Settings {
     int shapeParameter4 = 1;
     float nearPlane = 1;
     float farPlane = 1;
+    int toonLevel = 0;
+    bool toonEnable;
     bool perPixelFilter = false;
     bool kernelBasedFilter = false;
     bool extraCredit1 = false;

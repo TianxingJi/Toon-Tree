@@ -491,6 +491,11 @@ void Realtime::settingsChanged() {
         // do nothing but just do want to call update() to paintGL again
     }
 
+    if(settings.toonLevel != previousSettings.toonLevel ||
+       settings.toonEnable != previousSettings.toonEnable){
+
+    }
+
     // Update the stored previous settings
     previousSettings = settings;
 

@@ -55,3 +55,7 @@ Below are the materials referred to in this project.
 ### Known Bugs
 
 1. When you keep pressing the key that moves the camera while changing the parameters on the left side, then the key will be activated all the time that keeps moving the camera.
+
+### Instruction to Run
+
+1. This project is made based on Qt 6.7.3 for macOS and the laptop is M (ARM64) chip macbook. For other kind of laptops, we have not tested, but Ikenna' windows laptop does not support this project - to see the same thing in the macbook.
